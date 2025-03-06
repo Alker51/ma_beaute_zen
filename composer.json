@@ -87,6 +87,12 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "start": [
+            "symfony server:start"
+        ],
+        "stop": [
+            "symfony server:stop"
         ]
     },
     "conflict": {
