@@ -21,7 +21,7 @@ final class UserController extends AbstractController
             'controller_name' => 'UserController',
         ]);
     }
-    #[Route('/create', name: 'create')]
+    #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
     public function create(Request $request, UserRepository $userRepository): Response
     {
         $user = new User();
