@@ -1,4 +1,20 @@
 {{ form_start(form) }}
+    <button type="button" class="btn btn-warning" id="prefill-button">Préremplir les champs</button>
     {{ form_widget(form) }}
-<button class="btn">{{ button_label|default('Save') }}</button>
+    <button type="button" class="btn btn-success">{{ button_label|default('Créer mon compte') }}</button><br>
 {{ form_end(form) }}
+
+<script>
+    document.getElementById('prefill-button').addEventListener('click', function() {
+        document.querySelector('input[name="user[email]"]').value = 'test@example.com';
+        document.querySelector('input[name="user[password]"]').value = 'passTest';
+        document.querySelector('input[name="user[first_name]"]').value = 'passTest';
+        document.querySelector('input[name="user[last_name]"]').value = 'passTest';
+        alert('Penser à mettre une date pour le test !!!!!!')
+        document.querySelector('input[name="user[adress]"]').value = 'passTest';
+        document.querySelector('input[name="user[zipcode]"]').value = '89';
+        document.querySelector('input[name="user[city]"]').value = 'passTest';
+        document.querySelector('input[name="user[gender]"]').value = 1;
+        document.querySelector('input[name="user[phone]"]').value = 'passTest';
+    });
+</script>
