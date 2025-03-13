@@ -1,7 +1,7 @@
 {{ form_start(form) }}
     <button type="button" class="btn btn-warning" id="prefill-button">Préremplir les champs</button>
     {{ form_widget(form) }}
-    <button type="button" class="btn btn-success">{{ button_label|default('Créer mon compte') }}</button><br>
+    <button type="submit" class="btn btn-success">{{ button_label|default('Créer mon compte') }}</button><br>
 {{ form_end(form) }}
 
 <script>
