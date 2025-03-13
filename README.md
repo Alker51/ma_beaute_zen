@@ -10,7 +10,7 @@ Ce projet est une application développée avec Symfony, conçue pour les client
 
 ## Licence
 
-Ce projet est sous licence propriétaire.
+Ce projet est sous licence propriétaire de **Fragment Web**.
 
 ## Configuration Requise
 
@@ -35,7 +35,7 @@ Ce projet est sous licence propriétaire.
 
 1. Clonez le dépôt :
    ```bash
-   git clone <URL_DU_DEPOT>
+   git clone https://github.com/Alker51/ma_beaute_zen.git
    cd ma_beaute_zen
    ```
 
@@ -50,7 +50,7 @@ Ce projet est sous licence propriétaire.
 
 4. Lancez le serveur de développement :
    ```bash
-   symfony server\:start
+   composer start
    ```
 
 ## Scripts Composer
