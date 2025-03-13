@@ -44,7 +44,7 @@ final class UserController extends AbstractController
 
             $userRepository->save($user, true);
 
-            $result = $emailService->sendMail($user->getEmail(), 'Enregistrement du compte client réussi.', 'Merci pour votre inscription, vous pouvez consulter votre compte des maintenants.');
+            $result = $emailService->sendMail($user->getEmail(), 'Enregistrement du compte client réussi.', 'Merci pour votre inscription, vous pouvez consulter votre compte des maintenant.');
 
             return $this->redirectToRoute('app_user_home', [], Response::HTTP_SEE_OTHER);
         }
