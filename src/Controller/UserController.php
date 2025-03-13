@@ -55,12 +55,21 @@ final class UserController extends AbstractController
     }
 
     #[Route('/delete', name: 'delete', methods: ['GET', 'POST'])]
-    public function delete(Request $request, User $user, UserPasswordHasherInterface $passwordHasher): Response
+    public function delete(UserRepository $userRepository): Response
     {
-        $passwordEntry = '';
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        if(!$passwordHasher->isPasswordValid($user, $passwordEntry)) {
-            throw new AccessDeniedHttpException();
+        $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+
+        if(!empty($_POST['pass_entry'])) {
+            if ($user->getPassword() !== $_POST['pass_entry']) {
+                throw new AccessDeniedHttpException();
+            } else {
+                $userRepository->delete($user, true);
+                return $this->redirectToRoute('app_user_home', [], Response::HTTP_SEE_OTHER);
+            }
+        } else {
+            return $this->render('user/delete.html.twig');
         }
     }
 }
