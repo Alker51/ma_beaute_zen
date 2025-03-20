@@ -2,29 +2,26 @@
 
 namespace App\Entity;
 
-use App\Repository\TaxRepository;
+use App\Repository\ImageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: TaxRepository::class)]
-class Tax
+#[ORM\Entity(repositoryClass: ImageRepository::class)]
+class Image
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
-
-    #[ORM\Column]
-    private ?float $value = null;
+    #[ORM\Column(length: 2000)]
+    private ?string $link = null;
 
     /**
      * @var Collection<int, Produit>
      */
-    #[ORM\OneToMany(targetEntity: Produit::class, mappedBy: 'taxeId')]
+    #[ORM\ManyToMany(targetEntity: Produit::class, inversedBy: 'images')]
     private Collection $produits;
 
     public function __construct()
@@ -37,26 +34,14 @@ class Tax
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getLink(): ?string
     {
-        return $this->name;
+        return $this->link;
     }
 
-    public function setName(string $name): static
+    public function setLink(string $link): static
     {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getValue(): ?float
-    {
-        return $this->value;
-    }
-
-    public function setValue(float $value): static
-    {
-        $this->value = $value;
+        $this->link = $link;
 
         return $this;
     }
@@ -73,7 +58,6 @@ class Tax
     {
         if (!$this->produits->contains($produit)) {
             $this->produits->add($produit);
-            $produit->setTaxeId($this);
         }
 
         return $this;
@@ -81,12 +65,7 @@ class Tax
 
     public function removeProduit(Produit $produit): static
     {
-        if ($this->produits->removeElement($produit)) {
-            // set the owning side to null (unless already changed)
-            if ($produit->getTaxeId() === $this) {
-                $produit->setTaxeId(null);
-            }
-        }
+        $this->produits->removeElement($produit);
 
         return $this;
     }
