@@ -5,20 +5,31 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Mailer\Mailer;
-use Symfony\Component\Mailer\Transport;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 #[Route('/user', name: 'app_user_')]
 
 final class UserController extends AbstractController
 {
-    #[Route('/', name: 'home')]
+    private $logger;
+    private $tokenStorage;
+    private $emailService;
 
+    public function __construct(LoggerInterface $logger, TokenStorageInterface $tokenStorage)
+    {
+        $this->logger = $logger;
+        $this->tokenStorage = $tokenStorage;
+        $this->emailService = new EmailController();
+    }
+
+    #[Route('/', name: 'home')]
     public function index(): Response
     {
         return $this->render('user/index.html.twig', [
@@ -32,8 +43,6 @@ final class UserController extends AbstractController
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
-        $emailService = new EmailController();
-
         if ($form->isSubmitted() && $form->isValid()) {
 
             $hashedPassword = $passwordHasher->hashPassword(
@@ -44,7 +53,7 @@ final class UserController extends AbstractController
 
             $userRepository->save($user, true);
 
-            $result = $emailService->sendMail($user->getEmail(), 'Enregistrement du compte client réussi.', 'Merci pour votre inscription, vous pouvez consulter votre compte des maintenant.');
+            $this->emailService->sendMail($user->getEmail(), 'Enregistrement du compte client réussi.', 'Merci pour votre inscription, vous pouvez consulter votre compte des maintenant.');
 
             return $this->redirectToRoute('app_user_home', [], Response::HTTP_SEE_OTHER);
         }
@@ -55,18 +64,25 @@ final class UserController extends AbstractController
     }
 
     #[Route('/delete', name: 'delete', methods: ['GET', 'POST'])]
-    public function delete(UserRepository $userRepository): Response
+    public function delete(UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher, Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $passEntry = "";
+        if(!empty($_POST['pass_entry']))
+            $passEntry = $_POST['pass_entry'];
 
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
 
-        if(!empty($_POST['pass_entry'])) {
-            if ($user->getPassword() !== $_POST['pass_entry']) {
+        if (!empty($passEntry)) {
+            if (!$passwordHasher->isPasswordValid($user, $passEntry)) {
                 throw new AccessDeniedHttpException();
             } else {
+                $this->emailService->sendMail($user->getEmail(), 'Suppression du compte client réussi.', 'Nous sommes désolé de vous voir partir, nous espérons vous revoir bientôt.');
+
                 $userRepository->delete($user, true);
-                return $this->redirectToRoute('app_user_home', [], Response::HTTP_SEE_OTHER);
+                $request->getSession()->invalidate();
+                $this->tokenStorage->setToken(null);
+                return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
             }
         } else {
             return $this->render('user/delete.html.twig');
