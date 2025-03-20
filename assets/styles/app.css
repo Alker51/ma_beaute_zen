@@ -1,3 +1,6 @@
-body {
-    background-color: skyblue;
+.menu-item-return, .fa-solid {
+    color: #ffffff !important;
+    background-color: #aa0000 !important;
+    border-radius: 5px !important;
+    font-weight: bold;
 }
