@@ -50,8 +50,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $city = null;
 
-    #[ORM\Column]
-    private ?int $gender = null;
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Gender")]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Gender $gender;
 
     #[ORM\Column(length: 255)]
     private ?string $phone = null;
@@ -203,12 +204,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getGender(): ?int
+    public function getGender() : ?Gender
     {
         return $this->gender;
     }
 
-    public function setGender(int $gender): static
+    public function setGender(Gender $gender): static
     {
         $this->gender = $gender;
 
