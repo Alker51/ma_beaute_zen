@@ -20,7 +20,9 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email', EmailType::class)
+            ->add('email', EmailType::class, [
+                'label' => 'Adresse mail',
+            ])
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'first_options' => [
@@ -36,20 +38,33 @@ class UserType extends AbstractType
                     ]
                 ]
             ])
-            ->add('first_name', TextType::class)
-            ->add('last_name', TextType::class)
-            ->add('birth_date', DateType::class, [
-                'widget' => 'single_text',
+            ->add('first_name', TextType::class, [
+                'label' => 'Prénom',
             ])
-            ->add('adress', TextType::class)
-            ->add('zipcode', NumberType::class)
-            ->add('city', TextType::class)
+            ->add('last_name', TextType::class, [
+                'label' => 'Nom',
+            ])
+            ->add('birth_date', DateType::class, [
+                'label' => 'Date de naissance',
+                'widget' => 'choice',
+            ])
+            ->add('adress', TextType::class, [
+                'label' => 'Adresse',
+            ])
+            ->add('zipcode', NumberType::class, [
+                'label' => 'Code postal',
+            ])
+            ->add('city', TextType::class, [
+                'label' => 'Ville',
+            ])
             ->add('gender', EntityType::class, [
                 'class' => Gender::class,
                 'choice_label' => 'name',
                 'placeholder' => 'Choisissez un genre',
             ])
-            ->add('phone', NumberType::class)
+            ->add('phone', NumberType::class, [
+                'label' => 'Numéro de téléphone',
+            ])
         ;
     }
 
