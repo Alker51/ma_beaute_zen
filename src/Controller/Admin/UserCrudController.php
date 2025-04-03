@@ -23,7 +23,7 @@ class UserCrudController extends AbstractCrudController
     {
         return [
             //FormField::addTab('Informations Principals', propertySuffix: 'main'),
-            FormField::addColumn(4),
+            FormField::addColumn(4,'Information principals'),
             EmailField::new('email')->setLabel('Adresse mail'),
             TextField::new('first_name')->setLabel('Prénom'),
             TextField::new('last_name')->setLabel('Nom'),
@@ -31,7 +31,7 @@ class UserCrudController extends AbstractCrudController
 
 
             //FormField::addTab('Informations Personnelles', propertySuffix: 'personal'),
-            FormField::addColumn(4),
+            FormField::addColumn(4,'Informations Personnelles'),
             DateField::new('birth_date')->setLabel('Date de naissance')->hideOnIndex(),
             TextField::new('adress')->setLabel('Adresse')->hideOnIndex(),
             NumberField::new('zipcode')->setLabel('Code postal')->hideOnIndex(),
@@ -40,7 +40,7 @@ class UserCrudController extends AbstractCrudController
 
 
             //FormField::addTab('Administration du compte', propertySuffix: 'admin'),
-            FormField::addColumn(4),
+            FormField::addColumn(4, 'Administration du compte'),
             ChoiceField::new('roles')
                 ->setChoices([
                     'Utilisateur' => 'ROLE_USER',
