@@ -2,8 +2,16 @@
 
 namespace App\Form;
 
+use App\Entity\Gender;
 use App\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -12,18 +20,36 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email')
-            ->add('password')
-            ->add('first_name')
-            ->add('last_name')
-            ->add('birth_date', null, [
+            ->add('email', EmailType::class)
+            ->add('password', RepeatedType::class, [
+                'type' => PasswordType::class,
+                'first_options' => [
+                    'label' => 'Mot de passe',
+                    'attr' => [
+                        'autocomplete' => 'new-password',
+                    ]
+                ],
+                'second_options' => [
+                    'label' => 'Vérifier le mot de passe',
+                    'attr' => [
+                        'autocomplete' => 'new-password',
+                    ]
+                ]
+            ])
+            ->add('first_name', TextType::class)
+            ->add('last_name', TextType::class)
+            ->add('birth_date', DateType::class, [
                 'widget' => 'single_text',
             ])
-            ->add('adress')
-            ->add('zipcode')
-            ->add('city')
-            ->add('gender')
-            ->add('phone')
+            ->add('adress', TextType::class)
+            ->add('zipcode', NumberType::class)
+            ->add('city', TextType::class)
+            ->add('gender', EntityType::class, [
+                'class' => Gender::class,
+                'choice_label' => 'name',
+                'placeholder' => 'Choisissez un genre',
+            ])
+            ->add('phone', NumberType::class)
         ;
     }
 
@@ -31,6 +57,9 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'csrf_protection' => true,
+            'csrf_field_name' => '_token',
+            'csrf_token_id'   => 'user_csrf_token',
         ]);
     }
 }
