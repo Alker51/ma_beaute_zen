@@ -4,9 +4,14 @@ framework:
 
     # Note that the session will be started ONLY if you read or write from it.
     session: true
-
+    csrf_protection: ~
     #esi: true
     #fragments: true
+
+    form:
+        csrf_protection:
+            enabled: true
+            field_name: 'csrf_token'
 
 when@test:
     framework:
