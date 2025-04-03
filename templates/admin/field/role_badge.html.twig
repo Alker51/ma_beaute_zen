@@ -1,0 +1,7 @@
+{% if field.formattedValue == 'ROLE_ADMIN' %}
+    <span class="badge badge-danger">Administrateur</span>
+{% elseif field.formattedValue == 'ROLE_USER' %}
+    <span class="badge badge-primary">Utilisateur</span>
+{% else %}
+    <span class="badge badge-secondary">Aucun</span>
+{% endif %}

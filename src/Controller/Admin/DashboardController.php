@@ -70,7 +70,7 @@ class DashboardController extends AbstractDashboardController
 
     public function configureAssets(): Assets
     {
-        return Assets::new()->addCssFile('styles/app.css');
+        return Assets::new()->addCssFile('styles/admin.css');
     }
 
     public function configureUserMenu(UserInterface $user): UserMenu
