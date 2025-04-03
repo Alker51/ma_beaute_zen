@@ -4,3 +4,14 @@
     border-radius: 5px !important;
     font-weight: bold;
 }
+
+#admin-link {
+    background-color: #ffc107!important;
+    border-radius: 0.5em;
+}
+
+#admin-link:hover {
+    background-color: #e0a800 !important;
+    border-color: #d39e00;
+    border-radius: 0.5em;
+}
