@@ -108,6 +108,9 @@
         ],
         "db_fixtures_reload": [
             "php bin/console doctrine:fixtures:load"
+        ],
+        "db_purge": [
+            "php bin/console doctrine:database:drop --force"
         ]
     },
     "conflict": {
