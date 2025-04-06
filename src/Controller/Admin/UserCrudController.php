@@ -11,6 +11,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+
 
 class UserCrudController extends AbstractCrudController
 {
@@ -68,5 +70,14 @@ class UserCrudController extends AbstractCrudController
                 ->setTemplatePath('admin/field/role_badge.html.twig')
             ->onlyOnIndex(),
         ];
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setPageTitle('index', 'Gestion des comptes client') // Titre pour la page d'index
+            ->setPageTitle('detail', fn (User $user) => sprintf('Détails de %s', $user->getFirstName() . ' ' . $user->getLastName())) // Titre pour la page de détails
+            ->setPageTitle('edit', fn (User $user) => sprintf('Modification de %s', $user->getFirstName() . ' ' . $user->getLastName())) // Titre pour la page d'édition
+            ->setPageTitle('new', 'Créer un nouveau compte client'); // Titre pour la page de création
     }
 }
