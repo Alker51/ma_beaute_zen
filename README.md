@@ -53,8 +53,46 @@ Ce projet est sous licence propriétaire de **Fragment Web**.
    composer start
    ```
 
+5. Initialiser la base de donnée :
+   ```bash
+   composer db_total_reload
+   ```
+
 ## Scripts Composer
+
+Voici les différents scripts définis dans le fichier `composer.json` pour gérer des actions courantes dans le projet :
 
 - **Démarrer le serveur** : `composer start`
 - **Arrêter le serveur** : `composer stop`
 - **Nettoyer le cache** : `composer cache:clear`
+- **Rechargement complet de la base de données** : `composer db_total_reload`
+   - Supprime la base de données existante, recrée une nouvelle base de données, applique le schéma et charge les fixtures.
+- **Recharger uniquement les fixtures** : `composer db_fixtures_reload`
+   - Recharge uniquement les données des fixtures sans toucher au schéma ou à la base de données.
+- **Supprimer la base de données** : `composer db_purge`
+   - Supprime complètement la base de données pour un nettoyage rapide.
+
+### Exemple d'utilisation
+
+Pour effectuer un rechargement complet de la base de données (utile en développement) :
+
+```bash
+   composer db_total_reload
+```
+
+Si vous souhaitez simplement recharger les fixtures, utilisez :
+
+```bash
+   composer db_fixtures_reload
+```
+
+
+## Utilisateur Administrateur par Défaut
+
+Lors de l'initialisation de la base de données via les fixtures, un utilisateur administrateur est créé automatiquement avec les informations suivantes :
+
+- **Email** : `admin@example.com`
+- **Mot de passe** : `admin123`
+
+### Attention :
+Il est fortement recommandé de modifier ces informations dans un environnement de production pour des raisons de sécurité.
