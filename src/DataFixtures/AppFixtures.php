@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Gender;
+use App\Entity\Tax;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -52,5 +53,22 @@ class AppFixtures extends Fixture
 
         $manager->persist($admin);
         $manager->flush();
+
+        $tvaRates = [
+            ['name' => 'TVA normale 20%', 'value' => 20.0],   // Taux normal
+            ['name' => 'TVA intermédiaire 10%', 'value' => 10.0], // Taux intermédiaire
+            ['name' => 'TVA réduite 5,5%', 'value' => 5.5],       // Taux réduit
+            ['name' => 'TVA super réduite 2,1%', 'value' => 2.1], // Taux super réduit
+        ];
+
+        foreach ($tvaRates as $tvaRate) {
+            $tax = new Tax();
+            $tax->setName($tvaRate['name']);
+            $tax->setValue($tvaRate['value']);
+            $manager->persist($tax);
+        }
+
+        $manager->flush();
+
     }
 }
