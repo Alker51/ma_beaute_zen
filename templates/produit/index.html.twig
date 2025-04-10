@@ -4,31 +4,37 @@
 
 {% block body %}
     <h1>Liste des 50 derniers produits</h1>
-    <table>
+    <table class="table">
         <thead>
         <tr>
-            <th>#</th>
-            <th>Nom</th>
-            <th>Description</th>
-            <th>Prix HT</th>
-            <th>Statut</th>
-            <th>Actions</th>
+            <th scope="col">Nom</th>
+            <th scope="col">Description</th>
+            <th scope="col">Prix HT</th>
+            <th scope="col">TVA</th>
+            <th scope="col">Prix TTC</th>
+            <th scope="col">Statut</th>
+            <th scope="col">Actions</th>
         </tr>
         </thead>
         <tbody>
         {% for produit in produits %}
             <tr>
-                <td>{{ produit.id }}</td>
                 <td>{{ produit.name }}</td>
                 <td>{{ produit.description|striptags }}</td>
-                <td>{{ produit.priceHT }}</td>
+                <td>{{ produit.priceHT }} €</td>
+                <td>{{ produit.taxeId.value }} %</td>
+                <td>{{ produit.getPrixTTC()|number_format(2, ',', ' ') }} €</td>
                 <td>
-                    {{ produit.active ? 'Actif' : 'Inactif' }}
+                    {% if produit.active %}
+                        <span class="badge bg-success">Actif</span>
+                    {% else %}
+                        <span class="badge bg-danger">Inactif</span>
+                    {% endif %}
                 </td>
                 <td>
-                    <a href="{{ path('app_produit_show', { id: produit.id }) }}">Voir</a>
-                    <a href="{{ path('app_produit_edit', { id: produit.id }) }}">Modifier</a>
-                    <a href="{{ path('app_produit_delete', { id: produit.id }) }}">Supprimer</a>
+                    <a href="{{ path('app_produit_show', { id: produit.id }) }}"><button type="button" class="btn btn-primary">Voir</button></a>
+                    <a href="{{ path('app_produit_edit', { id: produit.id }) }}"><button type="button" class="btn btn-warning">Modifier</button></a>
+                    <a href="{{ path('app_produit_delete', { id: produit.id }) }}"><button type="button" class="btn btn-danger">Supprimer</button></a>
                 </td>
             </tr>
         {% endfor %}
