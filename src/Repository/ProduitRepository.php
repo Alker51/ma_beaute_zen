@@ -16,6 +16,16 @@ class ProduitRepository extends ServiceEntityRepository
         parent::__construct($registry, Produit::class);
     }
 
+    public function findLatest50(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.id', 'DESC') // Trie par ID décroissant
+            ->setMaxResults(50)       // Limite à 50 produits
+            ->getQuery()
+            ->getResult();
+    }
+
+
     //    /**
     //     * @return Produit[] Returns an array of Produit objects
     //     */
