@@ -41,26 +41,24 @@ class ProduitCrudController extends AbstractCrudController
                 })
                 ->setFormTypeOption('disabled', true),
             CollectionField::new('images', 'Images associées')
-                ->renderExpanded() // Affiche les entrées sous forme complète et non dans un champ replié
-                ->formatValue(function ($value, Produit $entity) {
-                    // Génération des miniatures pour chaque image
-                    $html = '<div style="display: flex; flex-wrap: wrap; gap: 10px;">';
+                ->setEntryType(ImageType::class) // Utiliser un sous-formulaire pour chaque image
+                ->renderExpanded() // Ouvrir les sous-formulaires dans le formulaire principal
+                ->allowAdd() // Permettre d’ajouter des images
+                ->allowDelete() // Permettre de supprimer des images
+                ->setFormTypeOption('by_reference', false) // Assurer une bonne gestion avec Doctrine
+                ->setFormTypeOption('entry_options', [
+                    'label' => false, // Pas de label pour chaque image
+                ])
+                ->formatValue(function ($value, $entity) {
+                    // Prévisuel HTML des images
+                    $html = '<div style="display: flex; gap: 10px;">';
                     foreach ($entity->getImages() as $image) {
-                        $html .= '<img src="' . $image->getLink() . '" alt="Image" style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px; border: 1px solid #ccc;">';
+                        $html .= '<img src="' . $image->getLink() . '" alt="Image" style="width: 75px; height: 75px; object-fit: cover; border-radius: 5px; border: 1px solid #ccc;">';
                     }
                     $html .= '</div>';
+
                     return $html;
                 })
-                ->onlyOnIndex(),
-            CollectionField::new('images', 'Images associées')
-                ->setEntryType(ImageType::class) // Définit un formulaire personnalisé pour chaque entrée de collection (voir plus bas)
-                ->setFormTypeOptions([
-                    'by_reference' => false, // Important pour gérer correctement les relations "ManyToMany"
-                ])
-                ->renderExpanded() // Ouvre directement les sous-formulaires dans le formulaire principal
-                ->allowAdd() // Autorise l'ajout d'images
-                ->allowDelete() // Autorise la suppression d'images
-                ->onlyOnForms()
 
         ];
     }
