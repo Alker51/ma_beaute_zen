@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
@@ -69,19 +70,9 @@ class UserCrudController extends AbstractCrudController
                 })
                 ->setTemplatePath('admin/field/role_badge.html.twig')
             ->onlyOnIndex(),
-            ChoiceField::new("want_newsletter")
-                ->setChoices([
-                    'Abonné(e)' => true,
-                    'Non Abonné(e)' => false,
-                ])
-                ->allowMultipleChoices()
-                ->renderAsBadges()
-                ->renderAsBadges([
-                    true => 'primary',
-                    false => 'danger',
-                ])
+            BooleanField::new("want_newsletter")
                 ->setLabel('Abonné(e) au newsletter')
-        ];
+            ];
     }
 
     public function configureCrud(Crud $crud): Crud
