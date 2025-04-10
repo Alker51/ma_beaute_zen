@@ -42,6 +42,9 @@ class Produit
     #[ORM\ManyToMany(targetEntity: Image::class, mappedBy: 'produits')]
     private Collection $images;
 
+    #[ORM\Column]
+    private ?int $delay = null;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
@@ -159,6 +162,18 @@ class Produit
         if ($this->images->removeElement($image)) {
             $image->removeProduit($this);
         }
+
+        return $this;
+    }
+
+    public function getDelay(): ?int
+    {
+        return $this->delay;
+    }
+
+    public function setDelay(int $delay): static
+    {
+        $this->delay = $delay;
 
         return $this;
     }
