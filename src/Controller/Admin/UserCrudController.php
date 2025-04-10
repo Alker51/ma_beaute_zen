@@ -69,6 +69,18 @@ class UserCrudController extends AbstractCrudController
                 })
                 ->setTemplatePath('admin/field/role_badge.html.twig')
             ->onlyOnIndex(),
+            ChoiceField::new("want_newsletter")
+                ->setChoices([
+                    'Abonné(e)' => true,
+                    'Non Abonné(e)' => false,
+                ])
+                ->allowMultipleChoices()
+                ->renderAsBadges()
+                ->renderAsBadges([
+                    true => 'primary',
+                    false => 'danger',
+                ])
+                ->setLabel('Abonné(e) au newsletter')
         ];
     }
 

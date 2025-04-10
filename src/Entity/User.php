@@ -57,6 +57,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $phone = null;
 
+    #[ORM\Column]
+    private ?bool $want_newsletter = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -224,6 +227,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhone(string $phone): static
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function isWantNewsletter(): ?bool
+    {
+        return $this->want_newsletter;
+    }
+
+    public function setWantNewsletter(bool $want_newsletter): static
+    {
+        $this->want_newsletter = $want_newsletter;
 
         return $this;
     }
