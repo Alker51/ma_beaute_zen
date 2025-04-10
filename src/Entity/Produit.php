@@ -177,4 +177,9 @@ class Produit
 
         return $this;
     }
+
+    public function getPrixTTC(): float
+    {
+        return $this->priceHT * (1 + ($this->taxeId->getValue() ?? 0) / 100);
+    }
 }
