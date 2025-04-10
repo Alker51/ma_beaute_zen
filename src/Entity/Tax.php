@@ -90,4 +90,10 @@ class Tax
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return sprintf('%s (%.2f%%)', $this->name ?? 'Taxe inconnue', $this->value ?? 0);
+    }
+
 }
