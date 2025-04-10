@@ -24,8 +24,8 @@ class AppFixtures extends Fixture
         $genderEntities = [];
 
         foreach ($genders as $gender) {
-            $genre = new Gender();
-            $genre->setName(ucfirst($gender));
+            $genre = new Gender()
+                ->setName(ucfirst($gender));
             $manager->persist($genre);
 
             $genderEntities[$gender] = $genre;
@@ -33,19 +33,19 @@ class AppFixtures extends Fixture
 
         $manager->flush();
 
-        $admin = new User();
-        $admin->setEmail('admin@example.com'); // Email de l'administrateur
-        $admin->setFirstName('ADMIN');
-        $admin->setLastName('ISTRATOR');
-        $admin->setPhone('0123456789');
-        $admin->setAdress('123 Rue des Admins');
-        $admin->setCity('AdminCity');
-        $admin->setZipcode('12345');
-        $admin->setBirthDate(new \DateTime('1980-01-01')); // Date de naissance
-        $admin->setGender($genderEntities['Homme']); // Genre associé
-
-        // Définir le rôle d'admin
-        $admin->setRoles(['ROLE_ADMIN']);
+        $admin = new User()
+            ->setEmail('admin@example.com') // Email de l'administrateur
+            ->setFirstName('ADMIN')
+            ->setLastName('ISTRATOR')
+            ->setPhone('0123456789')
+            ->setAdress('123 Rue des Admins')
+            ->setCity('AdminCity')
+            ->setZipcode('12345')
+            ->setBirthDate(new \DateTime('1980-01-01')) // Date de naissance
+            ->setGender($genderEntities['Homme']) // Genre associé
+            ->setWantNewsletter(true)
+            // Définir le rôle d'admin
+            ->setRoles(['ROLE_ADMIN']);
 
         // Hachage et définition du mot de passe
         $hashedPassword = $this->passwordHasher->hashPassword($admin, 'admin123');
@@ -62,9 +62,10 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($tvaRates as $tvaRate) {
-            $tax = new Tax();
-            $tax->setName($tvaRate['name']);
-            $tax->setValue($tvaRate['value']);
+            $tax = new Tax()
+                ->setName($tvaRate['name'])
+                ->setValue($tvaRate['value']);
+
             $manager->persist($tax);
         }
 
