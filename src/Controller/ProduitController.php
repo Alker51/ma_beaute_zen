@@ -17,7 +17,7 @@ final class ProduitController extends AbstractController
         ]);
     }
 
-    #[Route('/show/{id=', name: '_show')]
+    #[Route('/show/{id}', name: '_show')]
     public function show(): Response
     {
         return $this->render('produit/show.html.twig', [
