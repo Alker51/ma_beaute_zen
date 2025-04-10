@@ -39,7 +39,7 @@ class Produit
     /**
      * @var Collection<int, Image>
      */
-    #[ORM\ManyToMany(targetEntity: Image::class, mappedBy: 'produits')]
+    #[ORM\ManyToMany(targetEntity: Image::class, mappedBy: 'produits', cascade: ['persist'])]
     private Collection $images;
 
     #[ORM\Column]
@@ -157,10 +157,11 @@ class Produit
         return $this;
     }
 
-    public function removeImage(Image $image): static
+    public function removeImage(Image $image): self
     {
-        if ($this->images->removeElement($image)) {
-            $image->removeProduit($this);
+        if ($this->images->contains($image)) {
+            $this->images->removeElement($image);
+            $image->removeProduit($this); // Si relation inverse existe dans l'entité Image
         }
 
         return $this;
