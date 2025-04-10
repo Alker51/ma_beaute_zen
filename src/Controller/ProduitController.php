@@ -17,6 +17,14 @@ final class ProduitController extends AbstractController
         ]);
     }
 
+    #[Route('/show/{id=', name: '_show')]
+    public function show(): Response
+    {
+        return $this->render('produit/show.html.twig', [
+            'controller_name' => 'ProduitController',
+        ]);}
+
+    #[Route('/add', name: '_add')]
     public function add(): Response
     {
         return $this->render('produit/add.html.twig', [
@@ -24,6 +32,7 @@ final class ProduitController extends AbstractController
         ]);
     }
 
+    #[Route('/edit/{id}', name: '_edit')]
     public function edit(): Response
     {
         return $this->render('produit/edit.html.twig', [
@@ -31,6 +40,7 @@ final class ProduitController extends AbstractController
         ]);
     }
 
+    #[Route('/delete/{id}', name: '_delete')]
     public function delete(): Response
     {
         return $this->render('produit/delete.html.twig', [
