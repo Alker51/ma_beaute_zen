@@ -22,11 +22,22 @@ final class ProduitController extends AbstractController
     }
 
     #[Route('/show/{id}', name: '_show')]
-    public function show(): Response
+    public function show(int $id, ProduitRepository $produitRepository): Response
     {
+        // Récupération du produit via son id
+        $produit = $produitRepository->find($id);
+
+        // Si le produit n'existe pas, renvoyer une exception 404
+        if (!$produit) {
+            throw $this->createNotFoundException("Le produit avec l'ID {$id} n'existe pas.");
+        }
+
+        // Rendu de la vue en passant le produit
         return $this->render('produit/show.html.twig', [
-            'controller_name' => 'ProduitController',
-        ]);}
+            'produit' => $produit,
+        ]);
+
+    }
 
     #[Route('/add', name: '_add')]
     public function add(): Response
