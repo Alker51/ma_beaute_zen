@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Image;
 use App\Entity\Produit;
 use App\Entity\Tax;
 use App\Entity\User;
@@ -63,6 +64,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Compte Client', 'fa fa-user', User::class);
         yield MenuItem::linkToCrud('Taxe', 'fa fa-percent', Tax::class);
         yield MenuItem::linkToCrud('Produits', 'fa fa-box', Produit::class);
+        yield MenuItem::linkToCrud('Image', 'fa fa-images', Image::class);
         yield MenuItem::section();
         yield MenuItem::linkToLogout('Logout', 'fa-solid fa-right-from-bracket')->setCssClass('menu-item-return');
     }
