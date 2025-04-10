@@ -40,6 +40,7 @@ class ProduitCrudController extends AbstractCrudController
                     return number_format($entity->getPrixTTC(), 2, ',', ' ') . ' €';
                 })
                 ->setFormTypeOption('disabled', true),
+            NumberField::new('delay')->setLabel('Durée de la préstation (en minutes)'),
             CollectionField::new('images', 'Images associées')
                 ->setEntryType(ImageType::class) // Utiliser un sous-formulaire pour chaque image
                 ->renderExpanded() // Ouvrir les sous-formulaires dans le formulaire principal
