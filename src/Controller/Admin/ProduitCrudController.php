@@ -6,6 +6,7 @@ use App\Entity\Produit;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
@@ -39,6 +40,9 @@ class ProduitCrudController extends AbstractCrudController
                     return number_format($entity->getPrixTTC(), 2, ',', ' ') . ' €';
                 })
                 ->setFormTypeOption('disabled', true),
+            CollectionField::new('images', 'Images associées')
+                ->setFormTypeOption('by_reference', false)
+                ->useEntryCrudForm(ImageCrudController::class),
 
         ];
     }
