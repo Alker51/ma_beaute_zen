@@ -3,6 +3,8 @@
 namespace App\DataFixtures;
 
 use App\Entity\Gender;
+use App\Entity\Image;
+use App\Entity\Produit;
 use App\Entity\Tax;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -20,6 +22,63 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        $genderEntities = $this->generateGender($manager);
+        $manager->flush();
+
+        $admin = $this->generateAdmin($genderEntities);
+        $manager->persist($admin);
+        $manager->flush();
+
+        $taxEntities = $this->generateTaxes($manager);
+        $manager->flush();
+
+        $produit = $this->generateProduits($taxEntities);
+        $manager->persist($produit);
+        $manager->flush();
+
+        $image = $this->generateImage($produit);
+        $manager->persist($image);
+        $manager->flush();
+    }
+
+    public function generateProduits(array $tax): Produit
+    {
+        return new Produit()
+            ->setName('Produit test')
+            ->setDescription('Description du produit test')
+            ->setDelay(35)
+            ->setActive(true)
+            ->setPriceHT(9.99)
+            ->setPromoActive(false)
+            ->setTaxeId($tax['TVA normale 20%']);
+    }
+
+    public function generateTaxes(ObjectManager $manager): array
+    {
+        $tvaRates = [
+            ['name' => 'TVA normale 20%', 'value' => 20.0],   // Taux normal
+            ['name' => 'TVA intermédiaire 10%', 'value' => 10.0], // Taux intermédiaire
+            ['name' => 'TVA réduite 5,5%', 'value' => 5.5],       // Taux réduit
+            ['name' => 'TVA super réduite 2,1%', 'value' => 2.1], // Taux super réduit
+        ];
+
+        $taxEntities = [];
+
+        foreach ($tvaRates as $tvaRate) {
+            $tax = new Tax()
+                ->setName($tvaRate['name'])
+                ->setValue($tvaRate['value']);
+
+            $manager->persist($tax);
+
+            $taxEntities[$tvaRate['name']] = $tax;
+        }
+
+        return $taxEntities;
+    }
+
+    public function generateGender(ObjectManager $manager) :array
+    {
         $genders = ['Homme', 'Femme', 'Autre / Ne ce prononce pas'];
         $genderEntities = [];
 
@@ -31,8 +90,11 @@ class AppFixtures extends Fixture
             $genderEntities[$gender] = $genre;
         }
 
-        $manager->flush();
+        return $genderEntities;
+    }
 
+    public function generateAdmin(array $genderEntities) :User
+    {
         $admin = new User()
             ->setEmail('admin@example.com') // Email de l'administrateur
             ->setFirstName('ADMIN')
@@ -51,25 +113,13 @@ class AppFixtures extends Fixture
         $hashedPassword = $this->passwordHasher->hashPassword($admin, 'admin123');
         $admin->setPassword($hashedPassword);
 
-        $manager->persist($admin);
-        $manager->flush();
+        return $admin;
+    }
 
-        $tvaRates = [
-            ['name' => 'TVA normale 20%', 'value' => 20.0],   // Taux normal
-            ['name' => 'TVA intermédiaire 10%', 'value' => 10.0], // Taux intermédiaire
-            ['name' => 'TVA réduite 5,5%', 'value' => 5.5],       // Taux réduit
-            ['name' => 'TVA super réduite 2,1%', 'value' => 2.1], // Taux super réduit
-        ];
-
-        foreach ($tvaRates as $tvaRate) {
-            $tax = new Tax()
-                ->setName($tvaRate['name'])
-                ->setValue($tvaRate['value']);
-
-            $manager->persist($tax);
-        }
-
-        $manager->flush();
-
+    private function generateImage(Produit $produit): Image
+    {
+        return new Image()
+            ->setLink('https://i.ibb.co/VWCsjN02/a6bf59e8-7880-48b2-83e9-d7bd10af430c.jpg')
+            ->addProduit($produit);
     }
 }
