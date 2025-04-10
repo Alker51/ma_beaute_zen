@@ -1,10 +1,43 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}
-
-{% endblock %}
+{% block title %}Détails du produit : {{ produit.name }}{% endblock %}
 
 {% block body %}
+    <h1>Détails du produit</h1>
+    <div class="card">
+        <div class="card-header">
+            <h2>{{ produit.name }}</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>Description :</strong> {{ produit.description|raw }}</p>
 
+            <p><strong>Prix HT :</strong> {{ produit.priceHT|number_format(2, ',', ' ') }} €</p>
+            <p><strong>TVA :</strong> {{ produit.taxeId.name }} </p>
+            <p><strong>Prix TTC :</strong> {{ produit.getPrixTTC()|number_format(2, ',', ' ') }} €</p>
+
+            <p>
+                <strong>Statut :</strong>
+                {% if produit.active %}
+                    <span class="badge bg-success">Actif</span>
+                {% else %}
+                    <span class="badge bg-danger">Inactif</span>
+                {% endif %}
+            </p>
+
+            <p><strong>Images :</strong></p>
+            <div class="row">
+                {% for image in produit.images %}
+                    <div class="col-3" style="width: 250px">
+                        <img
+                                src="{{ image.link }}"
+                                class="img-fluid img-thumbnail"
+                                alt="Image de {{ produit.name }}"
+                        >
+                    </div>
+                {% else %}
+                    <p>Aucune image disponible pour ce produit.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 {% endblock %}
-
