@@ -27,7 +27,7 @@ final class ProduitController extends AbstractController
         // Récupération du produit via son id
         $produit = $produitRepository->find($id);
 
-        // Si le produit n'existe pas, renvoyer une exception 404
+        // Si le produit n'existe pas, renvoyer une exception 404.
         if (!$produit) {
             throw $this->createNotFoundException("Le produit avec l'ID {$id} n'existe pas.");
         }
