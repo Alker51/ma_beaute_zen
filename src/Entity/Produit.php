@@ -184,7 +184,17 @@ class Produit
 
     public function getPrixTTC(): float
     {
-        return $this->priceHT * (1 + ($this->taxeId->getValue() ?? 0) / 100);
+        if ($this->taxeId) {
+            $prixTTC = $this->priceHT * (1 + ($this->taxeId->getValue() ?? 0) / 100);
+
+            if($this->promoActive && $this->promoPercent && $this->promoPercent !== 0){
+                $prixTTC -= ($prixTTC * ($this->promoPercent /100));
+            }
+
+            return $prixTTC;
+        }
+
+        return 0.0;
     }
 
     public function getStock(): ?int

@@ -26,13 +26,17 @@ class ProduitCrudController extends AbstractCrudController
             TextEditorField::new('description')->hideOnIndex(),
             BooleanField::new('active')->setLabel('Produit en ligne ?'),
             NumberField::new('priceHT')->setLabel('Prix HT'),
+            BooleanField::new('promoActive')->setLabel('Promotion en cours ?'),
+            NumberField::new('promoPercent')->setLabel('Pourcentage promotionnel (si promo activé.'),
             NumberField::new('stock')->setLabel('Stocks disponibles')
                 ->formatValue(function ($value, $entity) {
                     // Prévisuel HTML des images
                     $html = '<button class="btn btn-';
 
-                    if ($entity->getStock() > 0) {
+                    if ($entity->getStock() >= 5) {
                         $html .= 'success';
+                    } elseif ($entity->getStock() > 0 && $entity->getStock() < 5) {
+                        $html .= 'warning';
                     } elseif ($entity->getStock() <= 0) {
                         $html .= 'danger';
                     }
