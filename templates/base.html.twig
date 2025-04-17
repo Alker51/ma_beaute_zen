@@ -25,7 +25,9 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ path('app_home') }}">Home</a>
+                            <a class="nav-link active" aria-current="page" href="{{ path('app_home') }}">
+                                <i class="fa-solid fa-home"></i>
+                            </a>
                         </li>
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                             {% if is_granted('ROLE_ADMIN') %}
