@@ -3,6 +3,34 @@
     border-radius: 0.5em;
 }
 
+.nav-item {
+    margin-inline: 0.2em;
+}
+
+#login-link {
+    background-color: #8f8f8f !important;
+    border-radius: 0.5em;
+    color: #2ad300 !important;
+}
+
+#logout-link {
+    background-color: #afafaf !important;
+    border-radius: 0.5em;
+    color: #aa0000 !important;
+}
+
+#create-link {
+    background-color: #1c8500 !important;
+    border-radius: 0.5em;
+    color: #ffffff !important;
+}
+
+#delete-link {
+    background-color: #aa0000 !important;
+    border-radius: 0.5em;
+    color: #ffffff !important;
+}
+
 #admin-link:hover {
     background-color: #e0a800 !important;
     border-color: #d39e00;

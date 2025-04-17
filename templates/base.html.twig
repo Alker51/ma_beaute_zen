@@ -24,47 +24,41 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ path('app_home') }}">
-                                <i class="fa-solid fa-home"></i>
-                            </a>
-                        </li>
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                             {% if is_granted('ROLE_ADMIN') %}
                             <li class="nav-item">
                                 <a class="nav-link active" id="admin-link" aria-current="page" href="{{ path('admin') }}">
-                                    Admin
+                                    <i class="fa-solid fa-key"></i> Interface Admin
                                 </a>
                             </li>
                             {% endif %}
                         {% endif %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                User
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ path('app_user_create') }}">Create</a></li>
-                                <li><a class="dropdown-item" href="{{ path('app_login') }}">Login</a></li>
 
-                                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{{ path('app_logout') }}">Logout</a></li>
-                                    <li><a class="dropdown-item" href="{{ path('app_user_delete') }}">Supprimer le compte</a></li>
-                                {% endif %}
-
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Image
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ path('app_user_create') }}">Create</a></li>
-                                <li><a class="dropdown-item" href="{{ path('app_login') }}">Login</a></li>
-                            </ul>
-                        </li>
+                        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                            <li class="nav-item">
+                                <a class="nav-link active" id="logout-link" href="{{ path('app_logout') }}">
+                                    <i class="fa-solid fa-door-closed"></i> Déconnexion
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" id="delete-link" href="{{ path('app_user_delete') }}">
+                                    <i class="fa-solid fa-user-minus"></i> Suppression de compte
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link active" id="create-link" href="{{ path('app_user_create') }}">
+                                    <i class="fa-solid fa-user-plus"></i> Création de compte
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" id="login-link" href="{{ path('app_login') }}">
+                                    <i class="fa-solid fa-door-open"></i> Connexion
+                                </a>
+                            </li>
+                        {% endif %}
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ path('app_produit_index') }}">Produits</a>
+                            <a class="nav-link active" aria-current="page" href="{{ path('app_produit_index') }}">Services</a>
                         </li>
                     </ul>
                     <form class="d-flex" role="search">
