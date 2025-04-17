@@ -45,6 +45,9 @@ class Produit
     #[ORM\Column]
     private ?int $delay = null;
 
+    #[ORM\Column]
+    private ?int $stock = null;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
@@ -182,5 +185,17 @@ class Produit
     public function getPrixTTC(): float
     {
         return $this->priceHT * (1 + ($this->taxeId->getValue() ?? 0) / 100);
+    }
+
+    public function getStock(): ?int
+    {
+        return $this->stock;
+    }
+
+    public function setStock(int $stock): static
+    {
+        $this->stock = $stock;
+
+        return $this;
     }
 }
