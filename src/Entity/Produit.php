@@ -48,6 +48,9 @@ class Produit
     #[ORM\Column]
     private ?int $stock = null;
 
+    #[ORM\Column]
+    private ?bool $noStockProduct = null;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
@@ -205,6 +208,18 @@ class Produit
     public function setStock(int $stock): static
     {
         $this->stock = $stock;
+
+        return $this;
+    }
+
+    public function isNoStockProduct(): ?bool
+    {
+        return $this->noStockProduct;
+    }
+
+    public function setNoStockProduct(bool $noStockProduct): static
+    {
+        $this->noStockProduct = $noStockProduct;
 
         return $this;
     }

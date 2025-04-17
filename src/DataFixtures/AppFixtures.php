@@ -51,7 +51,8 @@ class AppFixtures extends Fixture
             ->setPriceHT(9.99)
             ->setPromoActive(false)
             ->setTaxeId($tax['TVA normale 20%'])
-            ->setStock(15);
+            ->setStock(15)
+            ->setNoStockProduct(false);
     }
 
     public function generateTaxes(ObjectManager $manager): array

@@ -24,47 +24,72 @@ class ProduitCrudController extends AbstractCrudController
     {
         return [
             FormField::addColumn(4,'Informations du produit'),
-            TextField::new('name')->setLabel('Nom du produit'),
-            TextEditorField::new('description')->hideOnIndex(),
-            BooleanField::new('active')->setLabel('Produit en ligne ?'),
-            NumberField::new('delay')->setLabel('Durée de la préstation (en minutes)'),
+            TextField::new('name', 'Nom'),
+            TextEditorField::new('Description')
+                ->hideOnIndex(),
+            BooleanField::new('active', 'En ligne ?')
+                ->renderAsSwitch(false),
+            NumberField::new('delay', 'Durée de la préstation')
+                ->formatValue(function ($value, Produit $entity) {
+                    return $entity->getDelay() . ' minutes.';
+                }),
 
             FormField::addColumn(4,'Prix, Stock et Promotion'),
             FormField::addFieldset('Prix et TVA'),
-            NumberField::new('priceHT')->setLabel('Prix HT'),
-            AssociationField::new('taxeId')
-                ->setLabel('TVA appliquée')
+            NumberField::new('priceHT', 'Prix HT')
+                ->formatValue(function ($value, Produit $entity) {
+                    return number_format($entity->getPriceHT(), 2, ',', ' ') . ' € HT';
+                }),
+            AssociationField::new('taxeId', 'TVA appliquée')
                 ->formatValue(function ($value, Produit $entity) {
                     // Affiche une chaîne lisible
-                    return $entity->getTaxeId()
-                        ? $entity->getTaxeId()->getName() . ' (' . $entity->getTaxeId()->getValue() . '%)'
+                    return $entity->getTaxeId() ? $entity->getTaxeId()->getName() . ' (' . $entity->getTaxeId()->getValue() . '%)'
                         : 'Aucune taxe';
                 }),
             NumberField::new('prixTTC', 'Prix TTC')
-                ->setLabel('Prix TTC')
                 ->formatValue(function ($value, Produit $entity) {
-                    return number_format($entity->getPrixTTC(), 2, ',', ' ') . ' €';
+                    return number_format($entity->getPrixTTC(), 2, ',', ' ') . ' € TTC';
                 })
                 ->setFormTypeOption('disabled', true),
 
             FormField::addFieldset('Promotion'),
-            BooleanField::new('promoActive')->setLabel('Promotion en cours ?'),
-            NumberField::new('promoPercent')->setLabel('Pourcentage promotionnel (si promo activé.'),
+            BooleanField::new('promoActive', 'Promotion en cours ?')
+                ->renderAsSwitch(false),
+            NumberField::new('promoPercent', '% de réduction')
+                ->formatValue(function ($value, Produit $entity) {
+                    if($entity->getPromoPercent() > 0)
+                        return '<span class="badge badge-danger">'. number_format($entity->getPromoPercent(), 2, ',', ' ') . ' % de réduction.</span>';
+                    else
+                        return '';
+                }),
             FormField::addFieldset('Stock'),
-            NumberField::new('stock')->setLabel('Stocks disponibles')
+            BooleanField::new('noStockProduct', 'Produit sans stock ?')
+                ->renderAsSwitch(false),
+            NumberField::new('stock', 'Stocks disponibles')
+                ->setValue(0)
                 ->formatValue(function ($value, $entity) {
                     // Prévisuel HTML des images
-                    $html = '<button class="btn btn-';
+                    if($entity->isNoStockProduct())
+                        return '<span class="badge badge-info">Produit sans stock</span>';
+                    $html = '<span class="badge badge-';
 
                     if ($entity->getStock() >= 5) {
                         $html .= 'success';
+                        $text = '  produit(s) en stock';
                     } elseif ($entity->getStock() > 0 && $entity->getStock() < 5) {
                         $html .= 'warning';
+
+                        if($entity->getStock() == 1)
+                            $text = '  produit en stock';
+                        else
+                            $text = '  produit(s) en stock';
+
                     } elseif ($entity->getStock() <= 0) {
                         $html .= 'danger';
+                        $text = '  produit en stock';
                     }
 
-                    $html .= '">' . $entity->getStock() . '</span>';
+                    $html .= '">' . $entity->getStock() . $text .' </span>';
                     return $html;
                 }),
 
@@ -88,7 +113,6 @@ class ProduitCrudController extends AbstractCrudController
 
                     return $html;
                 })
-
         ];
     }
 }
