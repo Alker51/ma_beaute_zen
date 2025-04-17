@@ -26,7 +26,20 @@ class ProduitCrudController extends AbstractCrudController
             TextEditorField::new('description')->hideOnIndex(),
             BooleanField::new('active')->setLabel('Produit en ligne ?'),
             NumberField::new('priceHT')->setLabel('Prix HT'),
-            NumberField::new('stock')->setLabel('Stocks disponibles'),
+            NumberField::new('stock')->setLabel('Stocks disponibles')
+                ->formatValue(function ($value, $entity) {
+                    // Prévisuel HTML des images
+                    $html = '<button class="btn btn-';
+
+                    if ($entity->getStock() > 0) {
+                        $html .= 'success';
+                    } elseif ($entity->getStock() <= 0) {
+                        $html .= 'danger';
+                    }
+
+                    $html .= '">' . $entity->getStock() . '</span>';
+                    return $html;
+                }),
             AssociationField::new('taxeId')
                 ->setLabel('Taxe appliquée')
                 ->formatValue(function ($value, Produit $entity) {
