@@ -26,6 +26,7 @@ class ProduitCrudController extends AbstractCrudController
             TextEditorField::new('description')->hideOnIndex(),
             BooleanField::new('active')->setLabel('Produit en ligne ?'),
             NumberField::new('priceHT')->setLabel('Prix HT'),
+            NumberField::new('stock')->setLabel('Stocks disponibles'),
             AssociationField::new('taxeId')
                 ->setLabel('Taxe appliquée')
                 ->formatValue(function ($value, Produit $entity) {
