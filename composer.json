@@ -49,6 +49,7 @@
         "symfony/web-link": "7.2.*",
         "symfony/yaml": "7.2.*",
         "symfonycasts/reset-password-bundle": "^1.23",
+        "twbs/bootstrap-icons": "^1.11",
         "twig/extra-bundle": "^2.12|^3.20",
         "twig/twig": "^2.12|^3.20"
     },

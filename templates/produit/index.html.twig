@@ -32,9 +32,9 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{{ path('app_produit_show', { id: produit.id }) }}"><button type="button" class="btn btn-primary">Voir</button></a>
-                    <a href="{{ path('app_produit_edit', { id: produit.id }) }}"><button type="button" class="btn btn-warning">Modifier</button></a>
-                    <a href="{{ path('app_produit_delete', { id: produit.id }) }}"><button type="button" class="btn btn-danger">Supprimer</button></a>
+                    <a href="{{ path('app_produit_show', { id: produit.id }) }}" class="btn btn-primary">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </a>
                 </td>
             </tr>
         {% endfor %}
