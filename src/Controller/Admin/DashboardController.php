@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Contact;
 use App\Entity\Image;
 use App\Entity\Produit;
 use App\Entity\Tax;
@@ -61,7 +62,8 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         //yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Compte Client', 'fa fa-user', User::class);
+        yield MenuItem::linkToCrud('Compte client', 'fa fa-user', User::class);
+        yield MenuItem::linkToCrud('Demande client', 'fa fa-regular fa-circle-question', Contact::class);
         yield MenuItem::linkToCrud('Taxe', 'fa fa-percent', Tax::class);
         yield MenuItem::linkToCrud('Produits', 'fa fa-box', Produit::class);
         yield MenuItem::linkToCrud('Image', 'fa fa-images', Image::class);
