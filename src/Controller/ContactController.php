@@ -27,10 +27,16 @@ final class ContactController extends AbstractController
     }
     //TODO : Voir par la suite pour avoir une liste des contacts en cours pour un User.
     #[Route('/index', name: 'index')]
-    public function index(): Response
+    public function index(ContactRepository $contactRepository, UserRepository $userRepository): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+
+        $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+        $contacts = $contactRepository->findBy(['user' => $user]);
+
         return $this->render('contact/index.html.twig', [
-            'controller_name' => 'ContactController',
+            'title' => 'Liste des demandes en cours',
+            'contacts' => $contacts
         ]);
     }
 
@@ -65,7 +71,7 @@ final class ContactController extends AbstractController
 
             $contactRepository->save($contact, true);
 
-            return $this->redirectToRoute('app_user_home', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_contact_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('contact/new.html.twig', [
