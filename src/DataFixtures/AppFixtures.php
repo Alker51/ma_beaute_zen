@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Gender;
 use App\Entity\Image;
 use App\Entity\Produit;
+use App\Entity\State;
 use App\Entity\Tax;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -39,6 +40,10 @@ class AppFixtures extends Fixture
         $image = $this->generateImage($produit);
         $manager->persist($image);
         $manager->flush();
+
+        $this->generateState($manager);
+        $manager->flush();
+
     }
 
     public function generateProduits(array $tax): Produit
@@ -123,5 +128,16 @@ class AppFixtures extends Fixture
         return new Image()
             ->setLink('https://i.ibb.co/VWCsjN02/a6bf59e8-7880-48b2-83e9-d7bd10af430c.jpg')
             ->addProduit($produit);
+    }
+
+    private function generateState(ObjectManager $manager) :void
+    {
+        $states = ["En cours de traitement", "Résolue", "Abandonnée"];
+
+        foreach ($states as $state){
+            $statement = new State();
+            $statement->setName($state);
+            $manager->persist($statement);
+        }
     }
 }
