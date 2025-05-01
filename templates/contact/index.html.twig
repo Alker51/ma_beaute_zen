@@ -1,20 +1,34 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ContactController!{% endblock %}
+{% block title %}{{title}}{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/home/alker/Project/ma_beaute_zen/src/Controller/ContactController.php</code></li>
-        <li>Your template at <code>/home/alker/Project/ma_beaute_zen/templates/contact/index.html.twig</code></li>
-    </ul>
-</div>
+    <h1>{{ title }}</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Nom</th>
+            <th scope="col">Statut</th>
+            <th scope="col">Dernière modification le</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for contact in contacts %}
+            <tr>
+                <td>{{ contact.title }}</td>
+                <td>
+                    {% if contact.state.id == 1 %}
+                         <span class="badge bg-primary">{{ contact.state.name }}</span>
+                    {% elseif contact.state.id == 2 %}
+                    <span class="badge bg-success">{{ contact.state.name }}</span>
+                    {% else %}
+                         <span class="badge bg-danger">{{ contact.state.name }}</span>
+                    {% endif %}
+                </td>
+                <td> {{ contact.editedTime|date('d/m/Y H:s', "Europe/Paris") }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
