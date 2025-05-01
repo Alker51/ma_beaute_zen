@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,13 +17,11 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 final class UserController extends AbstractController
 {
-    private $logger;
-    private $tokenStorage;
-    private $emailService;
+    private TokenStorageInterface $tokenStorage;
+    private EmailController $emailService;
 
-    public function __construct(LoggerInterface $logger, TokenStorageInterface $tokenStorage)
+    public function __construct(TokenStorageInterface $tokenStorage)
     {
-        $this->logger = $logger;
         $this->tokenStorage = $tokenStorage;
         $this->emailService = new EmailController();
     }
