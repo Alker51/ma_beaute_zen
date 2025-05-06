@@ -26,6 +26,65 @@ class UserCrudController extends AbstractCrudController
     
     public function configureFields(string $pageName): iterable
     {
+        if($pageName === Crud::PAGE_DETAIL)
+            return [
+                //FormField::addTab('Informations Principals', propertySuffix: 'main'),
+                FormField::addColumn(4,'Information principals'),
+                EmailField::new('email')->setLabel('Adresse mail'),
+                TextField::new('first_name')->setLabel('Prénom'),
+                TextField::new('last_name')->setLabel('Nom'),
+                AssociationField::new('gender')->setLabel('Genre'),
+
+
+                //FormField::addTab('Informations Personnelles', propertySuffix: 'personal'),
+                FormField::addColumn(4,'Informations Personnelles'),
+                DateField::new('birth_date')->setLabel('Date de naissance')->hideOnIndex(),
+                TextField::new('adress')->setLabel('Adresse')->hideOnIndex(),
+                NumberField::new('zipcode')->setLabel('Code postal')->hideOnIndex(),
+                TextField::new('city')->setLabel('Ville')->hideOnIndex(),
+                TextField::new('phone')->setLabel('Numéro de téléphone'),
+
+
+                //FormField::addTab('Administration du compte', propertySuffix: 'admin'),
+                FormField::addColumn(4, 'Administration du compte'),
+                ChoiceField::new('roles')
+                    ->setChoices([
+                        'Utilisateur' => 'ROLE_USER',
+                        'Administrateur' => 'ROLE_ADMIN',
+                    ])
+                    ->allowMultipleChoices()
+                    ->renderAsBadges()
+                    ->renderAsBadges([
+                        'ROLE_USER' => 'primary',
+                        'ROLE_ADMIN' => 'danger',
+                    ])
+                    ->setLabel('Types de compte')
+                    ->hideOnIndex(),
+                TextField::new('mainRole', 'Rôle')
+                    ->formatValue(function ($value, User $entity) {
+                        $roles = $entity->getRoles();
+                        if (in_array('ROLE_ADMIN', $roles)) {
+                            return 'ROLE_ADMIN';
+                        } elseif (in_array('ROLE_USER', $roles)) {
+                            return 'ROLE_USER';
+                        }
+
+                        return 'NO_ROLE';
+                    })
+                    ->setTemplatePath('admin/field/role_badge.html.twig')
+                    ->onlyOnIndex(),
+                ChoiceField::new('wantNewsletter')
+                    ->setLabel('Abonné(e) à la newsletter')
+                    ->renderAsBadges([
+                        1 => 'success', // Si la valeur est 1
+                        0 => 'danger',  // Si la valeur est 0
+                    ])
+                    ->setChoices([
+                        'Oui' => 1,
+                        'Non' => 0,
+                    ])
+            ];
+
         return [
             //FormField::addTab('Informations Principals', propertySuffix: 'main'),
             FormField::addColumn(4,'Information principals'),

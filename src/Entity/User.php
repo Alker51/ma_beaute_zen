@@ -59,8 +59,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $phone = null;
 
-    #[ORM\Column]
-    private ?bool $want_newsletter = null;
+    #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: [
+        'default' => false
+    ])]
+    private ?bool $want_newsletter;
 
     /**
      * @var Collection<int, Contact>
