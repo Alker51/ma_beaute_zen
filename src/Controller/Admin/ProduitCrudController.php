@@ -7,9 +7,11 @@ use App\Form\ImageType;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
@@ -25,13 +27,33 @@ class ProduitCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
+        $product = $this->getContext()->getEntity()->getInstance();
+
+        $fields = [
             FormField::addColumn(4,'Informations du produit'),
+            FormField::addFieldset(''),
             TextField::new('name', 'Nom'),
             TextEditorField::new('Description')
-                ->hideOnIndex(),
-            BooleanField::new('active', 'En ligne ?')
-                ->renderAsSwitch(false),
+                ->hideOnIndex()
+        ];
+
+        if (in_array($pageName, [Crud::PAGE_INDEX, Crud::PAGE_DETAIL])) {
+            $fields[] = ChoiceField::new('active')
+                ->setLabel('Produit en ligne')
+                ->renderAsBadges([
+                    1 => 'success', // Si la valeur est 1
+                    0 => 'danger',  // Si la valeur est 0
+                ])
+                ->setChoices([
+                    'Oui' => 1,
+                    'Non' => 0,
+                ]); // Pour s'assurer que TINYINT est mappé correctement
+        } else {
+            $fields[] = BooleanField::new('active', 'Produit en ligne')
+                ->renderAsSwitch(false);
+        }
+
+        $fieldsAlt = [
             NumberField::new('delay', 'Durée de la préstation')
                 ->formatValue(function ($value, Produit $entity) {
                     return $entity->getDelay() . ' minutes.';
@@ -56,24 +78,67 @@ class ProduitCrudController extends AbstractCrudController
                 ->setFormTypeOption('disabled', true),
 
             FormField::addFieldset('Promotion'),
-            BooleanField::new('promoActive', 'Promotion en cours ?')
-                ->renderAsSwitch(false),
-            NumberField::new('promoPercent', '% de réduction')
+        ];
+
+        $fields = array_merge($fields, $fieldsAlt);
+
+        if (in_array($pageName, [Crud::PAGE_INDEX, Crud::PAGE_DETAIL])) {
+            $fields[] = ChoiceField::new('promoActive')
+                ->setLabel('Promotion en cours')
+                ->renderAsBadges([
+                    1 => 'success', // Si la valeur est 1
+                    0 => 'danger',  // Si la valeur est 0
+                ])
+                ->setChoices([
+                    'Oui' => 1,
+                    'Non' => 0,
+                ]); // Pour s'assurer que TINYINT est mappé correctement
+        } else {
+            $fields[] = BooleanField::new('promoActive', 'Promotion en cours')
+                ->renderAsSwitch(false);
+        }
+
+        if (!is_null($product) && $product->isPromoActive() === 1) {
+            $fields[] = NumberField::new('promoPercent', '% de réduction')
                 ->formatValue(function ($value, Produit $entity) {
-                    if($entity->getPromoPercent() > 0)
-                        return '<span class="badge badge-danger">'. number_format($entity->getPromoPercent(), 2, ',', ' ') . ' % de réduction.</span>';
-                    else
-                        return '';
-                }),
-            FormField::addFieldset('Stock'),
-            BooleanField::new('noStockProduct', 'Produit sans stock ?')
-                ->renderAsSwitch(false),
-            NumberField::new('stock', 'Stocks disponibles')
+                    return '<span class="badge badge-danger">'. number_format($entity->getPromoPercent(), 2, ',', ' ') . ' % de réduction.</span>';
+                });
+        } else {
+            $fields[] = NumberField::new('promoPercent', '% de réduction')
+                ->formatValue(function ($value, Produit $entity) {
+                    if(!$entity->isPromoActive())
+                        return '<span class="badge badge-info"> Aucune réduction</span>';
+
+                    return '<span class="badge badge-danger">'. number_format($entity->getPromoPercent(), 2, ',', ' ') . ' % de réduction.</span>';
+                });
+        }
+
+        $fields[] = FormField::addFieldset('Stock');
+
+        if (in_array($pageName, [Crud::PAGE_INDEX, Crud::PAGE_DETAIL])) {
+            $fields[] = ChoiceField::new('noStockProduct')
+                ->setLabel('Produit sans stock')
+                ->renderAsBadges([
+                    1 => 'success', // Si la valeur est 1
+                    0 => 'danger',  // Si la valeur est 0
+                ])
+                ->setChoices([
+                    'Oui' => 1,
+                    'Non' => 0,
+                ]); // Pour s'assurer que TINYINT est mappé correctement
+        } else {
+            $fields[] = BooleanField::new('noStockProduct', 'Produit sans stock')
+                ->renderAsSwitch(false);
+        }
+
+        //TODO : Trouver pourquoi $product est null alors que les autres test fonctionne.
+        //WARNING : Ne pas faire de var_dump de product sinon tout freeze.
+
+        if(!is_null($product) && !$product->isNoStockProduct() && $pageName !== Crud::PAGE_DETAIL){
+            $fields[] = NumberField::new('stock', 'Stocks disponibles')
                 ->setValue(0)
                 ->formatValue(function ($value, $entity) {
                     // Prévisuel HTML des images
-                    if($entity->isNoStockProduct())
-                        return '<span class="badge badge-info">Produit sans stock</span>';
                     $html = '<span class="badge badge-';
 
                     if ($entity->getStock() >= 5) {
@@ -94,9 +159,41 @@ class ProduitCrudController extends AbstractCrudController
 
                     $html .= '">' . $entity->getStock() . $text .' </span>';
                     return $html;
-                }),
+                });
+        } else {
+            $fields[] = NumberField::new('stock', 'Stocks disponibles')
+                ->setValue(0)
+                ->formatValue(function ($value, $entity) {
+                    // Prévisuel HTML des images
+                    $html = '<span class="badge badge-';
 
+                    if($entity->isNoStockProduct())
+                        return '<span class="badge badge-secondary">Produit sans stock</span>';
+
+                    if ($entity->getStock() >= 5) {
+                        $html .= 'success';
+                        $text = '  produit(s) en stock';
+                    } elseif ($entity->getStock() > 0 && $entity->getStock() < 5) {
+                        $html .= 'warning';
+
+                        if($entity->getStock() == 1)
+                            $text = '  produit en stock';
+                        else
+                            $text = '  produit(s) en stock';
+
+                    } elseif ($entity->getStock() <= 0) {
+                        $html .= 'danger';
+                        $text = '  produit en stock';
+                    }
+
+                    $html .= '">' . $entity->getStock() . $text .' </span>';
+                    return $html;
+                });
+        }
+
+        $fieldsAlt = [
             FormField::addColumn(4,'Visuel du produit'),
+            FormField::addFieldset(''),
             CollectionField::new('images', 'Images associées')
                 ->setEntryType(ImageType::class) // Utiliser un sous-formulaire pour chaque image
                 ->renderExpanded() // Ouvrir les sous-formulaires dans le formulaire principal
@@ -117,6 +214,10 @@ class ProduitCrudController extends AbstractCrudController
                     return $html;
                 })
         ];
+
+        $fields = array_merge($fields, $fieldsAlt);
+
+        return $fields;
     }
 
     public function configureActions(Actions $actions): Actions
