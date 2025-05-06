@@ -3,12 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\ContactRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ContactRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Contact
 {
     #[ORM\Id]
@@ -23,10 +25,10 @@ class Contact
     private ?string $detail = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $creationDate = null;
+    private ?DateTimeInterface $creationDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $editedTime = null;
+    private ?DateTimeInterface $editedTime = null;
 
     #[ORM\ManyToOne(inversedBy: 'contacts')]
     private ?User $user = null;
@@ -75,24 +77,24 @@ class Contact
         return $this;
     }
 
-    public function getCreationDate(): ?\DateTimeInterface
+    public function getCreationDate(): ?DateTimeInterface
     {
         return $this->creationDate;
     }
 
-    public function setCreationDate(\DateTimeInterface $creationDate): static
+    public function setCreationDate(DateTimeInterface $creationDate): static
     {
         $this->creationDate = $creationDate;
 
         return $this;
     }
 
-    public function getEditedTime(): ?\DateTimeInterface
+    public function getEditedTime(): ?DateTimeInterface
     {
         return $this->editedTime;
     }
 
-    public function setEditedTime(\DateTimeInterface $editedTime): static
+    public function setEditedTime(DateTimeInterface $editedTime): static
     {
         $this->editedTime = $editedTime;
 
@@ -152,4 +154,11 @@ class Contact
 
         return $this;
     }
+
+    #[ORM\PreUpdate]
+    public function updateEditedTime(): void
+    {
+        $this->editedTime = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
+    }
+
 }

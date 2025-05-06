@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Contact;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
@@ -39,13 +40,21 @@ class ContactCrudController extends AbstractCrudController
                     return '<span class="badge badge-'.$color.'">' . $state->getName() . '</span>';
                 }),
             DateField::new('editedTime', 'Dernière modification')
-                ->setFormat('dd/MM/yyyy HH:mm'),
+                ->setFormat('dd/MM/yyyy HH:mm')
+                ->hideOnForm(),
         ];
     }
 
-    public function configureActions(Actions $actions): Actions
+    /*public function configureActions(Actions $actions): Actions
     {
         // Supprime le bouton "Modifier"
-        return $actions->disable(Action::EDIT);
+        // return $actions->disable(Action::EDIT);
+    }*/
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setDefaultSort(['editedTime' => 'DESC']); // Tri décroissant par date (la plus récente en premier)
     }
+
 }
