@@ -45,15 +45,29 @@ class ContactCrudController extends AbstractCrudController
         ];
     }
 
-    /*public function configureActions(Actions $actions): Actions
+    public function configureActions(Actions $actions): Actions
     {
         // Supprime le bouton "Modifier"
-        // return $actions->disable(Action::EDIT);
-    }*/
+
+
+        // Activer l'action "Détail"
+        $detailAction = Action::new(Action::DETAIL)
+            ->linkToCrudAction('detail');
+
+
+        return $actions
+            ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
+                return $action->setLabel('Nouvelle demande client'); // Remplacer le texte
+            })
+            ->add(Crud::PAGE_INDEX, $detailAction)
+            ;
+    }
 
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
+            ->setEntityLabelInSingular('Demande client') // Nouveau texte pour "Créer Utilisateur"
+            ->setEntityLabelInPlural('Demandes client')
             ->setDefaultSort(['editedTime' => 'DESC']); // Tri décroissant par date (la plus récente en premier)
     }
 
