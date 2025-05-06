@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -78,9 +80,27 @@ class UserCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setPageTitle('index', 'Gestion des comptes client') // Titre pour la page d'index
-            ->setPageTitle('detail', fn (User $user) => sprintf('Détails de %s', $user->getFirstName() . ' ' . $user->getLastName())) // Titre pour la page de détails
-            ->setPageTitle('edit', fn (User $user) => sprintf('Modification de %s', $user->getFirstName() . ' ' . $user->getLastName())) // Titre pour la page d'édition
-            ->setPageTitle('new', 'Créer un nouveau compte client'); // Titre pour la page de création
+            ->setPageTitle(Crud::PAGE_INDEX, 'Gestion des comptes client') // Titre pour la page d'index
+            ->setPageTitle(Crud::PAGE_DETAIL, fn (User $user) => sprintf('Détails de %s', $user->getFirstName() . ' ' . $user->getLastName())) // Titre pour la page de détails
+            ->setPageTitle(Crud::PAGE_EDIT, fn (User $user) => sprintf('Modification de %s', $user->getFirstName() . ' ' . $user->getLastName())) // Titre pour la page d'édition
+            ->setPageTitle(Crud::PAGE_NEW, 'Créer un nouveau compte client'); // Titre pour la page de création
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        // Supprime le bouton "Modifier"
+
+
+        // Activer l'action "Détail"
+        $detailAction = Action::new(Action::DETAIL)
+            ->linkToCrudAction('detail');
+
+
+        return $actions
+            ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
+                return $action->setLabel('Nouveau compte client'); // Remplacer le texte
+            })
+            ->add(Crud::PAGE_INDEX, $detailAction)
+            ;
     }
 }
