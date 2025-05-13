@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ContactRepository;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -84,7 +85,7 @@ class Contact
 
     public function setCreationDate(DateTimeInterface $creationDate): static
     {
-        $this->creationDate = $creationDate;
+        $this->creationDate = new \DateTime(DateTimeImmutable::createFromFormat("u", $creationDate->getTimestamp()), new \DateTimeZone('Europe/Paris'));
 
         return $this;
     }
@@ -96,7 +97,7 @@ class Contact
 
     public function setEditedTime(DateTimeInterface $editedTime): static
     {
-        $this->editedTime = $editedTime;
+        $this->editedTime = new \DateTime(DateTimeImmutable::createFromFormat("u", $editedTime->getTimestamp()), new \DateTimeZone('Europe/Paris'));
 
         return $this;
     }
