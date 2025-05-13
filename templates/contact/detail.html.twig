@@ -19,7 +19,7 @@
             <p>Aucune reponse.</p>
         {% else %}
             {% for reply in contactReplies %}
-                <p>{{ reply.replayDate|date('d/m/Y h:i') }}</p>
+                <p>{{ reply.replayDate|date('d/m/Y H:i') }}</p>
                 <p>{{ reply.message }}</p>
             {% endfor %}
         {% endif %}

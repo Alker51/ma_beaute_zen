@@ -27,7 +27,7 @@
                          <span class="badge bg-danger">{{ contact.state.name }}</span>
                     {% endif %}
                 </td>
-                <td> {{ contact.editedTime|date('d/m/Y H:s') }}</td>
+                <td> {{ contact.editedTime|date('d/m/Y H:i') }}</td>
             </tr>
         {% endfor %}
         </tbody>

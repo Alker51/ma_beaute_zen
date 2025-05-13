@@ -37,7 +37,7 @@ final class ReplyController extends AbstractController
                 throw $this->createNotFoundException('Contact non trouvé');
             }
 
-            $reply->setReplayDate(new \DateTime('now'));
+            $reply->setReplayDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
             $reply->setContactReference($contact);
 
             $contact->setEditedTime(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
@@ -45,16 +45,10 @@ final class ReplyController extends AbstractController
             $contactRepository->save($contact, true);
             $replyRepository->save($reply, true);
 
-            $formatter = new IntlDateFormatter(
-                'fr_FR', // Locale en français
-                IntlDateFormatter::LONG, // Format long, avec le mois en toutes lettres
-                IntlDateFormatter::SHORT
-            );
-
             $body= '<div>
                 <h1>Vous avez reçu une reponse à votre demande</h1><br>
                 <h2>'. $reply->getMessage().'</h2><br>
-                <div>'.mb_strtoupper($formatter->format($reply->getReplayDate())).'</div><br><br>
+                <div>'. $reply->getReplayDate()->format('d/m/Y H:i'). '</div><br><br>
                 <div>Bonne journée</div>
             </div>';
 
