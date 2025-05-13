@@ -7,7 +7,6 @@ use App\Form\ImageType;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -39,15 +38,15 @@ class ProduitCrudController extends AbstractCrudController
 
         if (in_array($pageName, [Crud::PAGE_INDEX, Crud::PAGE_DETAIL])) {
             $fields[] = ChoiceField::new('active')
-                ->setLabel('Produit en ligne')
+                ->setLabel('État du produit')
                 ->renderAsBadges([
-                    1 => 'success', // Si la valeur est 1
-                    0 => 'danger',  // Si la valeur est 0
+                    1 => 'success',
+                    0 => 'danger',
                 ])
                 ->setChoices([
-                    'Oui' => 1,
-                    'Non' => 0,
-                ]); // Pour s'assurer que TINYINT est mappé correctement
+                    'En ligne' => 1,
+                    'Hors ligne' => 0,
+                ]);
         } else {
             $fields[] = BooleanField::new('active', 'Produit en ligne')
                 ->renderAsSwitch(false);
@@ -56,7 +55,10 @@ class ProduitCrudController extends AbstractCrudController
         $fieldsAlt = [
             NumberField::new('delay', 'Durée de la préstation')
                 ->formatValue(function ($value, Produit $entity) {
-                    return $entity->getDelay() . ' minutes.';
+                    if(is_null($entity->getDelay()) || $entity->getDelay() == 0)
+                        return 'Aucune durée indiquée.';
+                    else
+                        return $entity->getDelay() . ' minutes.';
                 }),
 
             FormField::addColumn(4,'Prix, Stock et Promotion'),
@@ -86,32 +88,27 @@ class ProduitCrudController extends AbstractCrudController
             $fields[] = ChoiceField::new('promoActive')
                 ->setLabel('Promotion en cours')
                 ->renderAsBadges([
-                    1 => 'success', // Si la valeur est 1
-                    0 => 'danger',  // Si la valeur est 0
+                    1 => 'success',
+                    0 => 'danger',
                 ])
                 ->setChoices([
                     'Oui' => 1,
                     'Non' => 0,
-                ]); // Pour s'assurer que TINYINT est mappé correctement
+                ])
+                ->hideOnIndex();
         } else {
             $fields[] = BooleanField::new('promoActive', 'Promotion en cours')
-                ->renderAsSwitch(false);
+                ->renderAsSwitch(false)
+                ->hideOnIndex();;
         }
 
-        if (!is_null($product) && $product->isPromoActive() === 1) {
-            $fields[] = NumberField::new('promoPercent', '% de réduction')
-                ->formatValue(function ($value, Produit $entity) {
-                    return '<span class="badge badge-danger">'. number_format($entity->getPromoPercent(), 2, ',', ' ') . ' % de réduction.</span>';
-                });
-        } else {
-            $fields[] = NumberField::new('promoPercent', '% de réduction')
-                ->formatValue(function ($value, Produit $entity) {
-                    if(!$entity->isPromoActive())
-                        return '<span class="badge badge-info"> Aucune réduction</span>';
+        $fields[] = NumberField::new('promoPercent', '% de réduction')
+            ->formatValue(function ($value, Produit $entity) {
+                if(!$entity->isPromoActive())
+                    return '<span class="badge badge-info"> Aucune réduction en cours.</span>';
 
-                    return '<span class="badge badge-danger">'. number_format($entity->getPromoPercent(), 2, ',', ' ') . ' % de réduction.</span>';
-                });
-        }
+                return '<span class="badge badge-danger">'. number_format($entity->getPromoPercent(), 2, ',', ' ') . ' % de réduction.</span>';
+            });
 
         $fields[] = FormField::addFieldset('Stock');
 
@@ -119,77 +116,47 @@ class ProduitCrudController extends AbstractCrudController
             $fields[] = ChoiceField::new('noStockProduct')
                 ->setLabel('Produit sans stock')
                 ->renderAsBadges([
-                    1 => 'success', // Si la valeur est 1
-                    0 => 'danger',  // Si la valeur est 0
+                    1 => 'success',
+                    0 => 'danger',
                 ])
                 ->setChoices([
                     'Oui' => 1,
                     'Non' => 0,
-                ]); // Pour s'assurer que TINYINT est mappé correctement
+                ])
+                ->hideOnIndex();
         } else {
             $fields[] = BooleanField::new('noStockProduct', 'Produit sans stock')
-                ->renderAsSwitch(false);
+                ->renderAsSwitch(false)
+                ->hideOnIndex();
         }
 
-        //TODO : Trouver pourquoi $product est null alors que les autres test fonctionne.
-        //WARNING : Ne pas faire de var_dump de product sinon tout freeze.
+        $fields[] = NumberField::new('stock', 'Stocks disponibles')
+            ->formatValue(function ($value, $entity) {
+                // Prévisuel HTML des images
+                $html = '<span class="badge badge-';
 
-        if(!is_null($product) && !$product->isNoStockProduct() && $pageName !== Crud::PAGE_DETAIL){
-            $fields[] = NumberField::new('stock', 'Stocks disponibles')
-                ->setValue(0)
-                ->formatValue(function ($value, $entity) {
-                    // Prévisuel HTML des images
-                    $html = '<span class="badge badge-';
+                if($entity->isNoStockProduct())
+                    return '<span class="badge badge-secondary">Produit sans stock.</span>';
 
-                    if ($entity->getStock() >= 5) {
-                        $html .= 'success';
-                        $text = '  produit(s) en stock';
-                    } elseif ($entity->getStock() > 0 && $entity->getStock() < 5) {
-                        $html .= 'warning';
+                if ($entity->getStock() >= 5) {
+                    $html .= 'success';
+                    $text = '  produit(s) en stock';
+                } elseif ($entity->getStock() > 0 && $entity->getStock() < 5) {
+                    $html .= 'warning';
 
-                        if($entity->getStock() == 1)
-                            $text = '  produit en stock';
-                        else
-                            $text = '  produit(s) en stock';
-
-                    } elseif ($entity->getStock() <= 0) {
-                        $html .= 'danger';
+                    if($entity->getStock() == 1)
                         $text = '  produit en stock';
-                    }
-
-                    $html .= '">' . $entity->getStock() . $text .' </span>';
-                    return $html;
-                });
-        } else {
-            $fields[] = NumberField::new('stock', 'Stocks disponibles')
-                ->setValue(0)
-                ->formatValue(function ($value, $entity) {
-                    // Prévisuel HTML des images
-                    $html = '<span class="badge badge-';
-
-                    if($entity->isNoStockProduct())
-                        return '<span class="badge badge-secondary">Produit sans stock</span>';
-
-                    if ($entity->getStock() >= 5) {
-                        $html .= 'success';
+                    else
                         $text = '  produit(s) en stock';
-                    } elseif ($entity->getStock() > 0 && $entity->getStock() < 5) {
-                        $html .= 'warning';
 
-                        if($entity->getStock() == 1)
-                            $text = '  produit en stock';
-                        else
-                            $text = '  produit(s) en stock';
+                } elseif ($entity->getStock() <= 0) {
+                    $html .= 'danger';
+                    $text = '  produit en stock';
+                }
 
-                    } elseif ($entity->getStock() <= 0) {
-                        $html .= 'danger';
-                        $text = '  produit en stock';
-                    }
-
-                    $html .= '">' . $entity->getStock() . $text .' </span>';
-                    return $html;
-                });
-        }
+                $html .= '">' . $entity->getStock() . $text .' </span>';
+                return $html;
+            });
 
         $fieldsAlt = [
             FormField::addColumn(4,'Visuel du produit'),
@@ -215,9 +182,7 @@ class ProduitCrudController extends AbstractCrudController
                 })
         ];
 
-        $fields = array_merge($fields, $fieldsAlt);
-
-        return $fields;
+        return array_merge($fields, $fieldsAlt);
     }
 
     public function configureActions(Actions $actions): Actions

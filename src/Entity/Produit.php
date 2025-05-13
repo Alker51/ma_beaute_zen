@@ -42,13 +42,13 @@ class Produit
     #[ORM\ManyToMany(targetEntity: Image::class, mappedBy: 'produits', cascade: ['persist'])]
     private Collection $images;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?int $delay = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?int $stock = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?bool $noStockProduct = null;
 
     public function __construct()
@@ -178,7 +178,7 @@ class Produit
         return $this->delay;
     }
 
-    public function setDelay(int $delay): static
+    public function setDelay(?int $delay): static
     {
         $this->delay = $delay;
 
@@ -205,7 +205,7 @@ class Produit
         return $this->stock;
     }
 
-    public function setStock(int $stock): static
+    public function setStock(?int $stock): static
     {
         $this->stock = $stock;
 
