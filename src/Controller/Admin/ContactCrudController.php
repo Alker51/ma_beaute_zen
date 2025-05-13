@@ -7,6 +7,7 @@ use DateTime;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
@@ -30,8 +31,7 @@ class ContactCrudController extends AbstractCrudController
         setlocale(LC_TIME, 'fr_FR.UTF-8', 'fra');
 
         $fields = [
-            FormField::addColumn(4,'Informations de la demande'),
-            FormField::addFieldset(''),
+            FormField::addFieldset('Informations de la demande'),
             TextField::new('title', 'Sujet'),
             AssociationField::new('state', 'État de la demande')
                 ->formatValue(function ($value, $entity) {
@@ -85,14 +85,31 @@ class ContactCrudController extends AbstractCrudController
                         return '<span class="badge badge-'.$color.'">' . mb_strtoupper($formatter->format($entity->getEditedTime())) . $info . '</span>';
                     }
                 ),
-            FormField::addColumn(4,'Messages'),
-            FormField::addFieldset(''),
+            FormField::addFieldset('Messages'),
             TextAreaField::new('detail', 'Message initial')->setDisabled(true)->formatValue(function ($value, $entity) {
                 return strip_tags($entity->getDetail());
-            }),
-            AssociationField::new('replies', 'Réponses'),
-
+            })
         ];
+
+        if($pageName === Crud::PAGE_DETAIL) {
+            $fields[] = CollectionField::new('replies', 'Réponses')
+                ->onlyOnDetail()
+                ->formatValue(function($value, $entity) {
+                    $output = '<ul style="list-style:none;padding-left:0">';
+                    $i = 0;
+                    foreach ($entity->getReplies() as $reply) {
+                        $i > 0 ? $output .= '<hr>':'';
+                        $output .= "<li><strong>" . $reply->getMessage() . "</strong> - <small>" . $reply->getReplayDate()->format('d/m/Y H:i') . "</small></li>";
+                        $i++;
+
+                    }
+                    $output .= '</ul>';
+                    return $output;
+                })
+                ->setDisabled(true);
+        } else {
+            $fields[] = CollectionField::new('replies', 'Réponses');
+        }
 
         return $fields;
     }
@@ -122,6 +139,7 @@ class ContactCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, $detailAction)
             ->add(Crud::PAGE_DETAIL, $reply)
             ->add(Crud::PAGE_EDIT, $reply)
+            ->disable(Crud::PAGE_EDIT)
             ;
     }
 

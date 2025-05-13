@@ -1,0 +1,16 @@
+{% set replies = ea_field.value ?? [] %}
+
+{% if replies|length > 0 %}
+    <ul>
+        {% for reply in replies %}
+            <li>
+                <strong>{{ reply.user ? reply.user.username : 'Utilisateur inconnu' }}</strong><br>
+                {{ reply.message }}<br>
+                <small>{{ reply.replayDate ? reply.replayDate|date('d/m/Y H:i') : '' }}</small>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <em>Aucune réponse</em>
+{% endif %}
+

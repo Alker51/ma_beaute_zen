@@ -7,6 +7,7 @@ use App\Form\ReplyType;
 use App\Repository\ContactRepository;
 use App\Repository\ReplyRepository;
 use App\Repository\UserRepository;
+use IntlDateFormatter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,15 +40,21 @@ final class ReplyController extends AbstractController
             $reply->setReplayDate(new \DateTime('now'));
             $reply->setContactReference($contact);
 
-            $contact->setEditedTime(new \DateTime('now'));
+            $contact->setEditedTime(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
 
             $contactRepository->save($contact, true);
             $replyRepository->save($reply, true);
 
+            $formatter = new IntlDateFormatter(
+                'fr_FR', // Locale en français
+                IntlDateFormatter::LONG, // Format long, avec le mois en toutes lettres
+                IntlDateFormatter::SHORT
+            );
+
             $body= '<div>
                 <h1>Vous avez reçu une reponse à votre demande</h1><br>
                 <h2>'. $reply->getMessage().'</h2><br>
-                <div>'.$reply->getReplayDate()->format('d/m/y H:i').'</div><br><br>
+                <div>'.mb_strtoupper($formatter->format($reply->getReplayDate())).'</div><br><br>
                 <div>Bonne journée</div>
             </div>';
 

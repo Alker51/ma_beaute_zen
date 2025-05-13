@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ReplyRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -60,7 +61,7 @@ class Reply
 
     public function setReplayDate(\DateTimeInterface $replayDate): static
     {
-        $this->replayDate = $replayDate;
+        $this->replayDate = new \DateTime(DateTimeImmutable::createFromFormat("u", $replayDate->getTimestamp()), new \DateTimeZone('Europe/Paris'));
 
         return $this;
     }
