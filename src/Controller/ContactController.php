@@ -78,4 +78,17 @@ final class ContactController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/detail/{id}', name: 'detail', methods: ['GET'])]
+    public function show(Contact $contact, ContactRepository $contactRepository, UserRepository $userRepository, StateRepository $stateRepository): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+
+        $replies = $contact->getReplies();
+
+        return $this->render('contact/detail.html.twig', [
+            'contact' => $contact,
+            'contactReplies' => $replies,
+        ]);
+    }
 }

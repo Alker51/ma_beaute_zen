@@ -16,7 +16,7 @@
         </thead>
         <tbody>
         {% for contact in contacts %}
-            <tr>
+            <tr onclick="document.location = '{{ path('app_contact_detail', {'id' : contact.id}) }}';">
                 <td>{{ contact.title }}</td>
                 <td>
                     {% if contact.state.id == 1 %}
