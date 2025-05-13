@@ -90,6 +90,8 @@ class ContactCrudController extends AbstractCrudController
             TextAreaField::new('detail', 'Message initial')->setDisabled(true)->formatValue(function ($value, $entity) {
                 return strip_tags($entity->getDetail());
             }),
+            AssociationField::new('replies', 'Réponses'),
+
         ];
 
         return $fields;
@@ -97,7 +99,15 @@ class ContactCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        // Supprime le bouton "Modifier"
+        // Définition du bouton "Répondre"
+        $reply = Action::new('reply', 'Répondre', 'fa fa-reply')
+            ->linkToRoute('app_reply', function ($entity) {
+                return [
+                    'contactId' => $entity->getId(),
+                ];
+            })
+            ->addCssClass('btn btn-success'); // Style Bootstrap
+
 
 
         // Activer l'action "Détail"
@@ -110,6 +120,8 @@ class ContactCrudController extends AbstractCrudController
                 return $action->setLabel('Nouvelle demande client'); // Remplacer le texte
             })
             ->add(Crud::PAGE_INDEX, $detailAction)
+            ->add(Crud::PAGE_DETAIL, $reply)
+            ->add(Crud::PAGE_EDIT, $reply)
             ;
     }
 
