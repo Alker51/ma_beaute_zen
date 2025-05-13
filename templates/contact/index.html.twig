@@ -4,6 +4,7 @@
 
 {% block body %}
     <h1>{{ title }}</h1>
+
     <table class="table">
         <thead>
         <tr>
@@ -31,4 +32,9 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <br>
+    <a href="{{ path('app_contact_create') }}" class="btn btn-primary">
+        <i class="fa fa-plus"></i> Nouvelle demande
+    </a>
 {% endblock %}
