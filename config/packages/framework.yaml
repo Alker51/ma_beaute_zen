@@ -13,6 +13,7 @@ framework:
             enabled: true
             field_name: 'csrf_token'
 
+    default_locale: fr
 when@test:
     framework:
         test: true
