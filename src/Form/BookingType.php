@@ -15,9 +15,19 @@ class BookingType extends AbstractType
             ->add('title')
             ->add('start', null, [
                 'widget' => 'single_text',
+                'html5' => true,
+                'with_seconds' => false, // facultatif : true pour activer les secondes
+                'input' => 'datetime',   // important pour bien accepter la date et l'heure
+                'label' => 'Début',
+
             ])
             ->add('end', null, [
                 'widget' => 'single_text',
+                'html5' => true,
+                'with_seconds' => false,
+                'input' => 'datetime',
+                'label' => 'Fin',
+
             ])
         ;
     }

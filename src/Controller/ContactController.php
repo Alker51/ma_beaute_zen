@@ -16,11 +16,6 @@ use function PHPUnit\Framework\throwException;
 #[Route('/contact', name: 'app_contact_')]
 final class ContactController extends AbstractController
 {
-    private CONST int PENDING_STATE = 1;
-    private CONST int FINISH_STATE = 2;
-    private CONST int DISCONTINUED_STATE = 3;
-
-
     private EmailController $emailService;
     public function __construct()
     {
@@ -61,7 +56,7 @@ final class ContactController extends AbstractController
             </div>';
 
             $contact->setCreationDate(new \DateTime('now'));
-            $contact->setState($stateRepository->findOneBy(['id' => $this::PENDING_STATE]));
+            $contact->setState($stateRepository->findOneBy(['id' => StateController::PENDING_STATE]));
             $contact->setUser($user);
             $contact->setEditedTime($contact->getCreationDate());
 
@@ -103,11 +98,11 @@ final class ContactController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
 
-        if($contact->getState()->getId() !== $this::PENDING_STATE) {
+        if($contact->getState()->getId() !== StateController::PENDING_STATE) {
             throwException(new \Exception('Le contact n\'est pas en cours de traitement.'));
         }
 
-        $contact->setState($stateRepository->findOneBy(['id' => $this::FINISH_STATE]));
+        $contact->setState($stateRepository->findOneBy(['id' => StateController::FINISH_STATE]));
         $contactRepository->save($contact, true);
 
         $body= '<div>
@@ -130,11 +125,11 @@ final class ContactController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
 
-        if ($contact->getState()->getId() !== $this::PENDING_STATE) {
+        if ($contact->getState()->getId() !== StateController::PENDING_STATE) {
             throwException(new \Exception('Le contact n\'est pas en cours de traitement.'));
         }
 
-        $contact->setState($stateRepository->findOneBy(['id' => $this::DISCONTINUED_STATE]));
+        $contact->setState($stateRepository->findOneBy(['id' => StateController::DISCONTINUED_STATE]));
         $contactRepository->save($contact, true);
 
         $body= '<div>

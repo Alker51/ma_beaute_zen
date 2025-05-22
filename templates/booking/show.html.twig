@@ -23,6 +23,10 @@
                 <th>End</th>
                 <td>{{ booking.end ? booking.end|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
+            <tr>
+                <th>State</th>
+                <td>{{ booking.state.name }}</td>
+            </tr>
         </tbody>
     </table>
 
