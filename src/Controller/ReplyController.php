@@ -46,7 +46,7 @@ final class ReplyController extends AbstractController
             $replyRepository->save($reply, true);
 
             $body= '<div>
-                <h1>Vous avez reçu une reponse à votre demande</h1><br>
+                <h1>Vous avez reçu une reponse à votre demande de </h1><br>
                 <h2>'. $reply->getMessage().'</h2><br>
                 <div>'. $reply->getReplayDate()->format('d/m/Y H:i'). '</div><br><br>
                 <div>Bonne journée</div>
