@@ -58,8 +58,8 @@ final class ReplyController extends AbstractController
                 'Ma Beauté Zen - Vous avez reçu une nouvelle reponse de ' . $reply->getAuthorString(),
                 '<!DOCTYPE html><html lang="fr">'.$body.'</html>');
 
-
-            return $this->redirectToRoute('app_contact_index', [], Response::HTTP_SEE_OTHER);
+            $old_route = $request->attributes->get('_route');
+            return $this->redirectToRoute($old_route);
         }
 
         return $this->render('reply/index.html.twig', [
