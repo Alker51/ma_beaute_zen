@@ -12,6 +12,14 @@
         <p>{{ contact.detail }}</p>
     </div>
 
+    {% if contact.state.id == 1 %}
+        <div>
+            <a href="{{ path('app_reply', {'contactId' : contact.id}) }}" class="btn btn-primary">
+                <i class="fa fa-comment-medical"></i> Répondre
+            </a>
+        </div>
+    {% endif %}
+
     <div>
         <h1>Reponses</h1>
 
@@ -26,7 +34,7 @@
                     {% else %}
                         <strong>SAV</strong>
                     {% endif %}
-                    à {{ reply.replayDate|date('d/m/Y H:i') }}
+                    <br>Date : {{ reply.replayDate|date('d/m/Y H:i') }}
                 </small>
                 {% if not loop.last %}
                     <br><hr>
@@ -35,6 +43,5 @@
             {% endfor %}
         {% endif %}
     </div>
-
 {% endblock %}
 

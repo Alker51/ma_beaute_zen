@@ -20,7 +20,7 @@ final class EmailController extends AbstractController
             ->from('no-replay@ma-beaute-zen.fr')
             ->to($to)
             ->subject($subject)
-            ->text($body);
+            ->html($body);
 
         try{
             $mailer->send($email);

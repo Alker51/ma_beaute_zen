@@ -27,6 +27,8 @@ final class ReplyController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
 
         $reply = new Reply();
+        $reply->setAuthor($userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]));
+
         $form = $this->createForm(ReplyType::class, $reply);
         $form->handleRequest($request);
 
@@ -45,7 +47,7 @@ final class ReplyController extends AbstractController
             $replyRepository->save($reply, true);
 
             $body= '<div>
-                <h1>Vous avez reçu une reponse à votre demande de ' . $reply->getAuthorString() . '</h1><br>
+                <h1>Vous avez reçu une reponse de ' . $reply->getAuthorString() . '</h1><br>
                 <h2>'. $reply->getMessage().'</h2><br>
                 <div>'. $reply->getReplayDate()->format('d/m/Y H:i'). '</div><br><br>
                 <div>Bonne journée</div>
@@ -53,7 +55,7 @@ final class ReplyController extends AbstractController
 
             $this->emailService->sendMail(
                 $contact->getUser()->getEmail(),
-                'Votre message a été envoyé.',
+                'Ma Beauté Zen - Vous avez reçu une nouvelle reponse de ' . $reply->getAuthorString(),
                 '<!DOCTYPE html><html lang="fr">'.$body.'</html>');
 
 

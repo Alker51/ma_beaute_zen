@@ -99,7 +99,7 @@ class ContactCrudController extends AbstractCrudController
                     $i = 0;
                     foreach ($entity->getReplies() as $reply) {
                         $i > 0 ? $output .= '<hr>':'';
-                        $output .= "<li><strong>" . $reply->getMessage() . "</strong> - <small>De " . $reply->getAuthorString() . ' à ' . $reply->getReplayDate()->format('d/m/Y H:i') . "</small></li>";
+                        $output .= "<li><strong>" . $reply->getMessage() . "</strong><br><small>De " . $reply->getAuthorString() . '<br>Date : ' . $reply->getReplayDate()->format('d/m/Y H:i') . "</small></li>";
                         $i++;
 
                     }
