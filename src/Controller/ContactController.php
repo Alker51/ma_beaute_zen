@@ -32,7 +32,7 @@ final class ContactController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
 
         $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
-        $contacts = $contactRepository->findBy(['user' => $user]);
+        $contacts = $contactRepository->findBy(['user' => $user], ['editedTime' => 'DESC']);
 
         return $this->render('contact/index.html.twig', [
             'title' => 'Liste des demandes en cours',
@@ -85,6 +85,11 @@ final class ContactController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
 
         $replies = $contact->getReplies();
+        $replies = $replies->toArray();
+
+        usort($replies, function($a, $b) {
+            return $b->getReplayDate() <=> $a->getReplayDate();
+        });
 
         return $this->render('contact/detail.html.twig', [
             'contact' => $contact,

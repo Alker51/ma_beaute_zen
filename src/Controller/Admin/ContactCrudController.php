@@ -72,7 +72,10 @@ class ContactCrudController extends AbstractCrudController
                         $info = '';
 
                         if($entity->getState()->getId() === 1){
-                            $info = ' (Ouvert depuis ' . $interval->days . ' jour' . ($interval->days > 1 ? 's' : '') . ')';
+                            $time = $interval->days == 0 ? 'Aujourd\'hui' : 'il y a ' . $interval->days . ' jour' . ($interval->days > 1 ? 's' : '');
+
+
+                            $info = ' ( Dernière réponse : ' . $time .' )';
                         }
 
                         $formatter = new IntlDateFormatter(
@@ -97,7 +100,14 @@ class ContactCrudController extends AbstractCrudController
                 ->formatValue(function($value, $entity) {
                     $output = '<ul style="list-style:none;padding-left:0">';
                     $i = 0;
-                    foreach ($entity->getReplies() as $reply) {
+                    $replies = $entity->getReplies();
+                    $replies = $replies->toArray();
+
+                    usort($replies, function($a, $b) {
+                        return $b->getReplayDate() <=> $a->getReplayDate();
+                    });
+
+                    foreach ($replies as $reply) {
                         $i > 0 ? $output .= '<hr>':'';
                         $output .= "<li><strong>" . $reply->getMessage() . "</strong><br><small>De " . $reply->getAuthorString() . '<br>Date : ' . $reply->getReplayDate()->format('d/m/Y H:i') . "</small></li>";
                         $i++;
