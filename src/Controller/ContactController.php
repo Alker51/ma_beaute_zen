@@ -11,13 +11,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use function PHPUnit\Framework\throwException;
 
 #[Route('/contact', name: 'app_contact_')]
 final class ContactController extends AbstractController
 {
     private CONST int PENDING_STATE = 1;
     private CONST int FINISH_STATE = 2;
-    private CONST int ABANDONNED_STATE = 3;
+    private CONST int DISCONTINUED_STATE = 3;
 
 
     private EmailController $emailService;
@@ -95,5 +96,59 @@ final class ContactController extends AbstractController
             'contact' => $contact,
             'contactReplies' => $replies,
         ]);
+    }
+
+    #[Route('/solve/{id}', name: 'solve', methods: ['GET'])]
+    public function solve(Contact $contact, ContactRepository $contactRepository, UserRepository $userRepository, StateRepository $stateRepository, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+
+        if($contact->getState()->getId() !== $this::PENDING_STATE) {
+            throwException(new \Exception('Le contact n\'est pas en cours de traitement.'));
+        }
+
+        $contact->setState($stateRepository->findOneBy(['id' => $this::FINISH_STATE]));
+        $contactRepository->save($contact, true);
+
+        $body= '<div>
+                <h1>Cloture de votre demande</h1><br>
+                <div>Nous vous informons que votre demande est maintenant cloturée.</div><br><br>
+                <div>Nous espérons que les réponses obtenue sont à la hauteur de vos espérance. Bonne journée</div>
+            </div>';
+
+        $this->emailService->sendMail(
+            $contact->getUser()->getEmail(),
+            'Cloture de votre demande',
+            '<!DOCTYPE html><html>'.$body.'</html>');
+
+        $old_route = $request->attributes->get('_route');
+        return $this->redirectToRoute($old_route);
+    }
+
+    #[Route('/discontinue/{id}', name: 'discontinue', methods: ['GET'])]
+    public function discontinue(Contact $contact, ContactRepository $contactRepository, UserRepository $userRepository, StateRepository $stateRepository, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+
+        if ($contact->getState()->getId() !== $this::PENDING_STATE) {
+            throwException(new \Exception('Le contact n\'est pas en cours de traitement.'));
+        }
+
+        $contact->setState($stateRepository->findOneBy(['id' => $this::DISCONTINUED_STATE]));
+        $contactRepository->save($contact, true);
+
+        $body= '<div>
+                <h1>Cloture de votre demande</h1><br>
+                <div>Nous vous informons que votre demande est maintenant cloturée.</div><br><br>
+                <div>Nous sommes désolé de n\'avoir pu vous répondre favorablement. Bonne journée</div>
+            </div>';
+
+        $this->emailService->sendMail(
+            $contact->getUser()->getEmail(),
+            'Cloture de votre demande',
+            '<!DOCTYPE html><html>'.$body.'</html>');
+
+        $old_route = $request->attributes->get('_route');
+        return $this->redirectToRoute($old_route);
     }
 }

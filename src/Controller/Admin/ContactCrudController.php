@@ -133,9 +133,23 @@ class ContactCrudController extends AbstractCrudController
                     'contactId' => $entity->getId(),
                 ];
             })
-            ->addCssClass('btn btn-success'); // Style Bootstrap
+            ->addCssClass('btn btn-primary'); // Style Bootstrap
 
+        $solve = Action::new('solve', 'Résoudre', 'fa fa-check')
+            ->linkToRoute('app_contact_solve', function ($entity) {
+                return [
+                    'id' => $entity->getId(),
+                ];
+            })
+            ->addCssClass('btn btn-success');
 
+        $discontinue = Action::new('discontinue', 'Abandonner', 'fa fa-trash-can')
+            ->linkToRoute('app_contact_discontinue', function ($entity) {
+                return [
+                    'id' => $entity->getId(),
+                ];
+            })
+            ->addCssClass('btn btn-danger');
 
         // Activer l'action "Détail"
         $detailAction = Action::new(Action::DETAIL)
@@ -149,6 +163,10 @@ class ContactCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, $detailAction)
             ->add(Crud::PAGE_DETAIL, $reply)
             ->add(Crud::PAGE_EDIT, $reply)
+            ->add(Crud::PAGE_DETAIL, $solve)
+            ->add(Crud::PAGE_EDIT, $solve)
+            ->add(Crud::PAGE_DETAIL, $discontinue)
+            ->add(Crud::PAGE_EDIT, $discontinue)
             ->disable(Crud::PAGE_EDIT)
             ;
     }

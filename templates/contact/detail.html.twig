@@ -20,6 +20,17 @@
         </div>
     {% endif %}
 
+    {% if is_granted('IS_AUTHENTICATED_FULLY') and contact.state.id == 1 %}
+        <div>
+            <a href="{{ path('app_contact_solve', {'id' : contact.id}) }}" class="btn btn-success">
+                <i class="fa fa-check"></i> Cloturer
+            </a>
+            <a href="{{ path('app_contact_discontinue', {'id' : contact.id}) }}" class="btn btn-danger">
+                <i class="fa fa-trash-can"></i> Abandonner
+            </a>
+        </div>
+    {% endif %}
+
     <div>
         <h1>Reponses</h1>
 
