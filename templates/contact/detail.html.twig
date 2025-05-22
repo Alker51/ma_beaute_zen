@@ -19,8 +19,19 @@
             <p>Aucune reponse.</p>
         {% else %}
             {% for reply in contactReplies %}
-                <p>{{ reply.replayDate|date('d/m/Y H:i') }}</p>
-                <p>{{ reply.message }}</p>
+                <strong>{{ reply.message }}</strong><br>
+                <small>De
+                    {% if reply.author is not null %}
+                        <strong>{{ reply.author.firstname }} {{ reply.author.lastname }}</strong>
+                    {% else %}
+                        <strong>SAV</strong>
+                    {% endif %}
+                    à {{ reply.replayDate|date('d/m/Y H:i') }}
+                </small>
+                {% if not loop.last %}
+                    <br><hr>
+                {% endif %}
+
             {% endfor %}
         {% endif %}
     </div>

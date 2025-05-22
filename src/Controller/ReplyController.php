@@ -7,7 +7,6 @@ use App\Form\ReplyType;
 use App\Repository\ContactRepository;
 use App\Repository\ReplyRepository;
 use App\Repository\UserRepository;
-use IntlDateFormatter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,7 +45,7 @@ final class ReplyController extends AbstractController
             $replyRepository->save($reply, true);
 
             $body= '<div>
-                <h1>Vous avez reçu une reponse à votre demande de </h1><br>
+                <h1>Vous avez reçu une reponse à votre demande de ' . $reply->getAuthorString() . '</h1><br>
                 <h2>'. $reply->getMessage().'</h2><br>
                 <div>'. $reply->getReplayDate()->format('d/m/Y H:i'). '</div><br><br>
                 <div>Bonne journée</div>

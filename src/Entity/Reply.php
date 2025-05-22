@@ -80,4 +80,13 @@ class Reply
 
         return $this;
     }
+
+    public function getAuthorString(): ?string
+    {
+        if (!$this->author) {
+            return 'SAV';
+        }
+
+        return $this->author->getFirstName() . ' ' . $this->author->getLastName();
+    }
 }
