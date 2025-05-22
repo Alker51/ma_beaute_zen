@@ -17,7 +17,7 @@ final class EmailController extends AbstractController
         $mailer = new Mailer($transport);
 
         $email = new Email()
-            ->from('no-replay@ma-beaute-zen.fr')
+            ->from('no-reply@ma-beaute-zen.fr')
             ->to($to)
             ->subject($subject)
             ->html($body);
