@@ -59,7 +59,10 @@ final class ReplyController extends AbstractController
                 '<!DOCTYPE html><html lang="fr">'.$body.'</html>');
 
             $old_route = $request->attributes->get('_route');
-            return $this->redirectToRoute($old_route);
+            if($old_route === 'admin')
+                return $this->redirectToRoute($old_route);
+
+            return $this->redirectToRoute('app_contact_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('reply/index.html.twig', [

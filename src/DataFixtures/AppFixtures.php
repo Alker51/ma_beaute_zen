@@ -132,7 +132,7 @@ class AppFixtures extends Fixture
 
     private function generateState(ObjectManager $manager) :void
     {
-        $states = ["En cours de traitement", "Résolue", "Abandonnée"];
+        $states = ["En cours de traitement", "Résolue", "Abandonnée", "Validé", "En attente", "Refusé", "Réalisé", "Annulé"];
 
         foreach ($states as $state){
             $statement = new State();
