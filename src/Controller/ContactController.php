@@ -112,7 +112,7 @@ final class ContactController extends AbstractController
 
         $body= '<div>
                 <h1>Cloture de votre demande</h1><br>
-                <div>Nous vous informons que votre demande est maintenant cloturée.</div><br><br>
+                <div>Nous vous informons que votre demande est cloturée.</div><br><br>
                 <div>Nous espérons que les réponses obtenue sont à la hauteur de vos espérance. Bonne journée</div>
             </div>';
 
@@ -139,7 +139,7 @@ final class ContactController extends AbstractController
 
         $body= '<div>
                 <h1>Cloture de votre demande</h1><br>
-                <div>Nous vous informons que votre demande est maintenant cloturée.</div><br><br>
+                <div>Nous vous informons que votre demande est abandonnée.</div><br><br>
                 <div>Nous sommes désolé de n\'avoir pu vous répondre favorablement. Bonne journée</div>
             </div>';
 
