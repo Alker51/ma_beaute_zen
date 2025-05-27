@@ -27,6 +27,13 @@ class Booking
     #[ORM\JoinColumn(nullable: false)]
     private ?State $state = null;
 
+    #[ORM\ManyToOne(inversedBy: 'bookings')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $customer = null;
+
+    #[ORM\ManyToOne(inversedBy: 'bookingsToComplete')]
+    private ?User $worker = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -76,6 +83,30 @@ class Booking
     public function setState(?State $state): static
     {
         $this->state = $state;
+
+        return $this;
+    }
+
+    public function getCustomer(): ?User
+    {
+        return $this->customer;
+    }
+
+    public function setCustomer(?User $customer): static
+    {
+        $this->customer = $customer;
+
+        return $this;
+    }
+
+    public function getWorker(): ?User
+    {
+        return $this->worker;
+    }
+
+    public function setWorker(?User $worker): static
+    {
+        $this->worker = $worker;
 
         return $this;
     }

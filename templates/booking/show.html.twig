@@ -3,36 +3,33 @@
 {% block title %}Booking{% endblock %}
 
 {% block body %}
-    <h1>Booking</h1>
-
     <table class="table">
+        <h1> Rendez-vous #: {{ booking.id }}</h1>
         <tbody>
             <tr>
-                <th>Id</th>
-                <td>{{ booking.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
+                <th>Titre</th>
                 <td>{{ booking.title }}</td>
             </tr>
             <tr>
-                <th>Start</th>
-                <td>{{ booking.start ? booking.start|date('Y-m-d H:i:s') : '' }}</td>
+                <th>Date du Rendez-vous</th>
+                <td>Le {{ booking.start ? booking.start|date('Y-m-d') : '' }}, de {{ booking.start ? booking.start|date('H:i') : '' }} à {{ booking.end ? booking.end|date('H:i') : '' }}</td>
             </tr>
             <tr>
-                <th>End</th>
-                <td>{{ booking.end ? booking.end|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>State</th>
+                <th>État : </th>
                 <td>{{ booking.state.name }}</td>
+            </tr>
+            <tr>
+                <th>Client</th>
+                <td>{{ booking.customer.firstName }} {{ booking.customer.lastName }}</td>
+            </tr>
+            <tr>
+                <th>Employé attribué au Rendez-vous</th>
+                <td>{{ booking.worker ? booking.worker.firstName ~ " " ~ booking.worker.lastName : "Aucun employé attribué pour le moment." }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_booking_index') }}">back to list</a>
+    <a class="btn btn-warning" href="{{ path('app_booking_edit', {'id': booking.id}) }}">Modifier le rendez-vous.</a>
 
-    <a href="{{ path('app_booking_edit', {'id': booking.id}) }}">edit</a>
-
-    {{ include('booking/_delete_form.html.twig') }}
+    <a class="btn btn-danger" href="{{ path('app_booking_delete', {'id': booking.id}) }}">Supprimer le rendez-vous.</a>
 {% endblock %}

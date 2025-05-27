@@ -76,10 +76,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Reply::class, mappedBy: 'author')]
     private Collection $replies;
 
+    /**
+     * @var Collection<int, Booking>
+     */
+    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'customer')]
+    private Collection $bookings;
+
+    /**
+     * @var Collection<int, Booking>
+     */
+    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'worker')]
+    private Collection $bookingsToComplete;
+
     public function __construct()
     {
         $this->contacts = new ArrayCollection();
         $this->replies = new ArrayCollection();
+        $this->bookings = new ArrayCollection();
+        $this->bookingsToComplete = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -319,6 +333,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($reply->getAuthor() === $this) {
                 $reply->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Booking>
+     */
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
+    }
+
+    public function addBooking(Booking $booking): static
+    {
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings->add($booking);
+            $booking->setCustomer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBooking(Booking $booking): static
+    {
+        if ($this->bookings->removeElement($booking)) {
+            // set the owning side to null (unless already changed)
+            if ($booking->getCustomer() === $this) {
+                $booking->setCustomer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Booking>
+     */
+    public function getBookingsToComplete(): Collection
+    {
+        return $this->bookingsToComplete;
+    }
+
+    public function addBookingsToComplete(Booking $bookingsToComplete): static
+    {
+        if (!$this->bookingsToComplete->contains($bookingsToComplete)) {
+            $this->bookingsToComplete->add($bookingsToComplete);
+            $bookingsToComplete->setWorker($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBookingsToComplete(Booking $bookingsToComplete): static
+    {
+        if ($this->bookingsToComplete->removeElement($bookingsToComplete)) {
+            // set the owning side to null (unless already changed)
+            if ($bookingsToComplete->getWorker() === $this) {
+                $bookingsToComplete->setWorker(null);
             }
         }
 
