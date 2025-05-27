@@ -36,3 +36,7 @@
     border-color: #d39e00;
     border-radius: 0.5em;
 }
+
+.fc-toolbar-title {
+    text-transform: capitalize;
+}
