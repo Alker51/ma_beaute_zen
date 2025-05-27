@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Booking;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,6 +16,26 @@ class BookingRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Booking::class);
     }
+
+    public function hasOverlappingBooking(User $worker, \DateTimeInterface $start, \DateTimeInterface $end, ?int $excludeId = null): bool
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->select('count(b.id)')
+            ->where('b.worker = :worker')
+            ->andWhere('b.start < :end')
+            ->andWhere('b.end > :start')
+            ->setParameter('worker', $worker)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end);
+
+        if ($excludeId) {
+            $qb->andWhere('b.id != :id')
+                ->setParameter('id', $excludeId);
+        }
+
+        return $qb->getQuery()->getSingleScalarResult() > 0;
+    }
+
 
     //    /**
     //     * @return Booking[] Returns an array of Booking objects
