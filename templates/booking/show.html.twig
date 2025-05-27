@@ -29,7 +29,10 @@
         </tbody>
     </table>
 
-    <a class="btn btn-warning" href="{{ path('app_booking_edit', {'id': booking.id}) }}">Modifier le rendez-vous.</a>
-
-    <a class="btn btn-danger" href="{{ path('app_booking_delete', {'id': booking.id}) }}">Supprimer le rendez-vous.</a>
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        {% if is_granted('ROLE_ADMIN') %}
+            <a class="btn btn-warning" href="{{ path('app_booking_edit', {'id': booking.id}) }}">Modifier le rendez-vous.</a>
+            <a class="btn btn-danger" href="{{ path('app_booking_delete', {'id': booking.id}) }}">Supprimer le rendez-vous.</a>
+        {% endif %}
+    {% endif %}
 {% endblock %}
