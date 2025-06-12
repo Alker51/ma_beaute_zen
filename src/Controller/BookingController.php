@@ -3,17 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Booking;
+use App\Entity\User;
 use App\Form\BookingType;
 use App\Repository\BookingRepository;
 use App\Repository\StateRepository;
 use App\Repository\UserRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 #[Route('/booking')]
 final class BookingController extends AbstractController
@@ -41,17 +42,44 @@ final class BookingController extends AbstractController
     #[Route('/new', name: 'app_booking_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, StateRepository $stateRepository, UserRepository $userRepository): Response
     {
+        $saisie = $request->getSession()->get('saisie_formulaire_rdv', []);
+
+        //$request->getSession()->remove('saisie_formulaire_rdv');
         $booking = new Booking();
-        $form = $this->createForm(BookingType::class, $booking, [
+
+        if(!empty($saisie)) {
+            $booking->setStart(new \DateTime($saisie['booking']['start']));
+            $booking->setEnd(new \DateTime($saisie['booking']['end']));
+            $booking->setWorker($userRepository->findOneBy(['id' => $saisie['booking']['worker']]));
+            $booking->setTitle($saisie['booking']['title']);
+
+            $form = $this->createForm(BookingType::class, $booking, [
                 'is_admin' => $this->isGranted('ROLE_ADMIN'),
-            ]
-        );
+            ]);
+            $request->getSession()->remove('saisie_formulaire_rdv');
+        } else {
+            $form = $this->createForm(BookingType::class, $booking, [
+                    'is_admin' => $this->isGranted('ROLE_ADMIN'),
+                ]
+            );
+        }
+
         $form->handleRequest($request);
         $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $booking->setState($stateRepository->findOneBy(['id' => StateController::PENDING_VALIDATION_STATE]));
             $booking->setCustomer($user);
+
+            $bookingGood = $this->checkOverlap($booking->getWorker(), $booking->getStart(), $booking->getEnd(), $entityManager->getRepository(Booking::class), $entityManager->getRepository(User::class));
+
+            if(!$bookingGood) {
+                $session = $request->getSession();
+                $session->set('saisie_formulaire_rdv', $request->request->all());
+
+                return $this->redirectToRoute('app_error', ['title' => 'Le rendez-vous est indisponible.', 'message' => 'Nous sommes désolé mais le rendez-vous que vous avez demandé n\'est pas disponible, merci de sélectionner un autre pratiquant ou bien un horaire différent.'], Response::HTTP_SEE_OTHER);
+            }
+
             $entityManager->persist($booking);
             $entityManager->flush();
 
@@ -89,6 +117,12 @@ final class BookingController extends AbstractController
                 $booking->setWorker($originalEmploye);
             }
 
+            $bookingGood = $this->checkOverlap($booking->getWorker(), $booking->getStart(), $booking->getEnd(), $entityManager->getRepository(Booking::class), $entityManager->getRepository(User::class));
+
+            if(!$bookingGood) {
+                return $this->redirectToRoute('app_error', ['title' => 'Le rendez-vous est indisponible.', 'message' => 'Nous sommes désolé mais le rendez-vous que vous avez demandé n\'est pas disponible, merci de sélectionner un autre pratiquant ou bien un horaire différent.'], Response::HTTP_SEE_OTHER);
+            }
+
             $entityManager->flush();
             return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -110,47 +144,26 @@ final class BookingController extends AbstractController
         return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/booking/check-overlap', name: 'booking_check_overlap', methods: ['POST'])]
-    public function checkOverlap(Request $request, BookingRepository $repository, UserRepository $userRepository): JsonResponse
+    public function checkOverlap(User $worker, \DateTimeInterface $startRaw, \DateTimeInterface $endRaw, BookingRepository $bookingRepository, UserRepository $userRepository): bool
     {
-        $workerId = $request->request->get('worker');
-        $startRaw = $request->request->get('start');
-        $endRaw = $request->request->get('end');
-
-        $submittedToken = $request->request->get('_token');
-        // L'id 'booking_item' doit être le même que celui de BookingType !
-        if (!$this->isCsrfTokenValid('booking_item', $submittedToken)) {
-            return new JsonResponse([
-                'success' => false,
-                'error' => 'Jeton CSRF invalide'
-            ], 400);
-        }
-
-
-
-        if (!is_numeric($workerId) || empty($startRaw) || empty($endRaw)) {
-            return new JsonResponse(['success' => false, 'error' => 'Paramètres manquants ou invalides'], 400);
-        }
-
-        $worker = $userRepository->find((int)$workerId);
-        if (!$worker) {
-            return new JsonResponse(['success' => false, 'error' => 'Travailleur introuvable'], 404);
-        }
-
         try {
-            $start = new \DateTime($startRaw);
-            $end = new \DateTime($endRaw);
+            $start = DateTime::createFromInterface($startRaw);
+            $end = DateTime::createFromInterface($endRaw);
         } catch (\Exception $e) {
-            return new JsonResponse(['success' => false, 'error' => 'Format de date invalide'], 400);
+            return false;
         }
 
         if ($start >= $end) {
-            return new JsonResponse(['success' => false, 'error' => 'La date de début doit précéder la date de fin'], 400);
+            return false;
         }
 
-        $hasOverlap = $repository->hasOverlappingBooking($worker, $start, $end);
+        $hasOverlap = $bookingRepository->hasOverlappingBooking($worker, $start, $end);
 
-        return new JsonResponse(['overlap' => $hasOverlap, 'success' => true]);
+        if ($hasOverlap) {
+            return false;
+        }
+
+        return true;
     }
 
 }
