@@ -1,0 +1,15 @@
+{{ form_start(form) }}
+    {{ form_row(form.title) }}
+    {{ form_row(form.start) }}
+    {{ form_row(form._token) }}
+    {{ form_row(form.end) }}
+<button class="btn btn-success" type="submit">Réserver</button>
+{{ form_end(form) }}
+
+<script>
+    flatpickr("input[type=datetime-local]", {
+        enableTime: true,
+        dateFormat: "Y-m-d\\TH:i",
+        time_24hr: true,
+    });
+</script>

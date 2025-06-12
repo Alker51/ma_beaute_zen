@@ -1,8 +1,12 @@
 # Ma Beauté Zen
 
+---
+
 ## Description
 
-**Ma Beauté Zen** est une application web développée avec le framework Symfony. Elle est conçue pour répondre aux besoins de la gestion clients, de la publicité et de l'administration de la société **Ma Beauté Zen**.
+Projet Symfony propulsé par PHP 8.4+, avec gestion avancée du backend et des assets front-end via NPM.
+
+---
 
 ## Fonctionnalités
 
@@ -11,6 +15,23 @@
 - ✉️ **Envoi d'email** : Intégration avec Symfony Mailer pour des notifications automatiques.
 - 📦 **Catalogue de produits** : Consultation des produits avec leur prix, leurs taxes et autres détails.
 - 📃 **Taux de TVA** : Gestion simplifiée des différents taux de TVA français directement dans l'application.
+
+---
+
+## 🚀 Stack technique
+
+- **Symfony 7.2**
+- **PHP >=8.4**
+- **Doctrine ORM & Migrations**
+- **Twig** pour le templating
+- **EasyAdmin** pour un back-office rapide
+- **Monolog** pour la gestion des logs
+- **AMPHP** pour les besoins asynchrones
+- **Tattali Calendar Bundle** pour la gestion de calendrier
+- **Bootstrap Icons**
+- **Gestion des assets** avec NPM
+- **Stimulus, UX Turbo, Asset Mapper** (Front dynamique et moderne)
+- **Mailer, Notifier** (Emails/SMS)
 
 ---
 
@@ -28,44 +49,79 @@ Avant de commencer, assurez-vous que votre environnement respecte les prérequis
 
 ---
 
-## Installation
+## 📦 Dépendances principales
 
-**Étapes pour démarrer le projet :**
+### PHP (extraits des principaux bundles)
 
-1. **Clonez le dépôt :**
+- `symfony/framework-bundle`
+- `doctrine/orm`
+- `doctrine/doctrine-bundle`
+- `easycorp/easyadmin-bundle`
+- `symfony/twig-bundle`, `twig/twig`
+- `symfony/mailer`, `symfony/notifier`
+- `symfony/security-bundle`, `symfony/password-hasher`
+- `symfony/validator`, `symfony/form`
+- `symfonycasts/reset-password-bundle`
+- `tattali/calendar-bundle`
+- `phpstan/phpdoc-parser`
+- (et beaucoup d'autres, voir composer.json pour la liste complète)
+
+### Packages de développement
+
+- `phpunit/phpunit`
+- `symfony/maker-bundle`
+- `doctrine/doctrine-fixtures-bundle`
+- `symfony/web-profiler-bundle`
+- Outils pour tests, debug, fixtures, etc.
+
+### JavaScript/Front (via NPM)
+
+- Développement et gestion des assets front avec NPM
+- Utilisation de packages JS pour le front (ajoute ici la liste si besoin, ex: Bootstrap, StimulusJS…)
+
+---
+
+## ⚡ Installation
+
+1. **Cloner le projet**
    ```bash
-   git clone https://github.com/Alker51/ma_beaute_zen.git
-   cd ma_beaute_zen
+   git clone <repo>
+   cd <dossier>
    ```
 
-2. **Installez les dépendances :**
+2. **Installer les dépendances PHP**
    ```bash
    composer install
    ```
 
-3. **Configurer les variables d'environnement :**
-    - Copiez le fichier `.env` par défaut :
-      ```bash
-      cp .env .env.local
-      ```
-    - Configurez les variables nécessaires, comme la connexion à la base de données (optionnel si vous utilisez SQLite).
+3. **Installer les dépendances JavaScript**
+   ```bash
+   npm install
+   ```
 
-4. **Configurer la base de données :**
-    - Créez votre base de données et le schéma à partir des entités définies :
-      ```bash
-      php bin/console doctrine:database:create
-      php bin/console doctrine:schema:update --force
-      ```
-    - (Optionnel) Chargez les fixtures pour des données initiales :
-      ```bash
-      php bin/console doctrine:fixtures:load
-      ```
+4. **Configurer l'environnement**
+   ```bash
+   cp .env .env.local
+   # Adapter selon votre configuration (base SQLite par défaut)
+   ```
 
-5. **Lancez le serveur de développement :**
+5. **Préparer la base de données**
+   ```bash
+   php bin/console doctrine:database:create
+   php bin/console doctrine:migrations:migrate
+   ```
+
+6. **Charger les fixtures (données de test)**
+   ```bash
+   composer db_fixtures_reload
+   ```
+
+7. **Démarrer le serveur Symfony**
    ```bash
    composer start
+   # ou
+   symfony server:start
    ```
-   Accédez à l'application à l'URL : [http://localhost:8000](http://localhost:8000).
 
 ---
 
@@ -106,6 +162,10 @@ Utilisez les commandes suivantes avec `composer` pour gérer le projet rapidemen
 - **Nettoyer le cache** :
   ```bash
   composer cache:clear
+  ```
+- **Purger la base de données**
+  ```bash
+  composer db_purge
   ```
 
 ---

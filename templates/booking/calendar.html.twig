@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <style>
+        .fc-toolbar-title {
+            text-transform: capitalize; /* Met la première lettre du titre du calendrier en majuscule */
+        }
+
+        html, body {
+            height: 100%;            /* Nécessaire pour que 100% fonctionne en profondeur */
+            margin: 0;
+            padding: 0;
+        }
+
+
+        #calendar-holder {
+            height: 100vh;           /* Prend toute la hauteur de la fenêtre */
+        }
+
+        .fc {
+            height: 100% !important; /* Force FullCalendar à utiliser toute la hauteur de son parent */
+        }
+
+        .fc-button {
+            color: #fff !important;                  /* Couleur du texte */
+            border: none !important;                 /* Supprime la bordure */
+            border-radius: 6px !important;           /* Bords arrondis */
+            padding: 8px 16px !important;            /* Espace interne */
+            margin: 0 1px !important;
+            font-weight: bold !important;
+        }
+
+        .fc-newEvent-button {
+            background-color: #037e0b !important;
+        }
+
+
+    </style>
+
+    <div id="calendar-holder"></div> <!-- Élément HTML qui va contenir le calendrier FullCalendar -->
+{% endblock %}
+
+{% block javascripts %}
+    <!-- Inclusion de la librairie FullCalendar et de la langue française -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales/fr.global.min.js"></script>
+
+    <script type="text/javascript">
+        // Quand le DOM est complètement chargé
+        document.addEventListener('DOMContentLoaded', () => {
+            // On récupère l'élément qui contiendra le calendrier
+            const calendarEl = document.getElementById('calendar-holder');
+
+            // On initialise un nouvel objet FullCalendar sur l'élément récupéré
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                locale: 'fr', // Définit la langue du calendrier en français
+                initialView: 'timeGridWeek', // Définit la vue par défaut à l'ouverture (vue semaine avec créneaux horaires)
+                editable: false, // Autorise l'utilisateur à déplacer / éditer les événements par drag & drop
+                eventOverlap: false, // Empêche le chevauchement de deux événements par drag & drop
+                height: '100%',
+                // Définition des boutons personnalisés
+                customButtons: {
+                    newEvent: { // Création d'un bouton personnalisé appelé 'newEvent'
+                        text: 'Ajouter un évènement', // Libellé du bouton
+                        click: function () {
+                            // Quand on clique dessus, on redirige vers la page de création d'évènement
+                            window.location.href = "{{ path('app_booking_new') }}";
+                        }
+                    }
+                },
+                // Source de récupération des événements (depuis un endpoint Symfony)
+                eventSources: [
+                    {
+                        url: "{{ path('fc_load_events') }}", // URL pour charger les événements existants
+                        method: 'POST', // Utilisation de la méthode POST pour envoyer la requête
+                        extraParams: {
+                            filters: JSON.stringify({}) // Paramètres supplémentaires (ici vide)
+                        },
+                        failure: () => {
+                            // Fonction en cas d'échec du chargement des événements (actuellement désactivée)
+                            // alert('There was an error while fetching FullCalendar!');
+                        },
+                    },
+                ],
+                // Configuration de la barre d’en-tête (toolbar)
+                headerToolbar: {
+                    left: 'prev,next today newEvent', // Boutons affichés à gauche de la barre (précédent, suivant, aujourd'hui, bouton personnalisé)
+                    center: 'title', // Affiche le titre du calendrier au centre
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay', // Boutons affichés à droite (vue mois, semaine, jour)
+                },
+                timeZone: 'UTC', // Définit le fuseau horaire (ici UTC)
+                // Personnalisation du texte des boutons de vue et "aujourd'hui"
+                buttonText: {
+                    today:    'Aujourd\'hui',
+                    month:    'Mois',
+                    week:     'Semaine',
+                    day:      'Jour',
+                    list:     'Liste'
+                },
+            });
+
+            // Affiche le calendrier à l'écran après configuration
+            calendar.render();
+        });
+    </script>
+{% endblock %}

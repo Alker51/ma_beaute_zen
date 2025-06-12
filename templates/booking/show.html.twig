@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Booking{% endblock %}
+
+{% block body %}
+    <table class="table">
+        <h1> Rendez-vous #: {{ booking.id }}</h1>
+        <tbody>
+            <tr>
+                <th>Titre</th>
+                <td>{{ booking.title }}</td>
+            </tr>
+            <tr>
+                <th>Date du Rendez-vous</th>
+                <td>Le {{ booking.start ? booking.start|date('Y-m-d') : '' }}, de {{ booking.start ? booking.start|date('H:i') : '' }} à {{ booking.end ? booking.end|date('H:i') : '' }}</td>
+            </tr>
+            <tr>
+                <th>État : </th>
+                <td>{{ booking.state.name }}</td>
+            </tr>
+            <tr>
+                <th>Client</th>
+                <td>{{ booking.customer.firstName }} {{ booking.customer.lastName }}</td>
+            </tr>
+            <tr>
+                <th>Employé attribué au Rendez-vous</th>
+                <td>{{ booking.worker ? booking.worker.firstName ~ " " ~ booking.worker.lastName : "Aucun employé attribué pour le moment." }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        {% if is_granted('ROLE_ADMIN') %}
+            <a class="btn btn-warning" href="{{ path('app_booking_edit', {'id': booking.id}) }}">Modifier le rendez-vous.</a>
+            <a class="btn btn-danger" href="{{ path('app_booking_delete', {'id': booking.id}) }}">Supprimer le rendez-vous.</a>
+        {% endif %}
+    {% endif %}
+{% endblock %}
