@@ -114,21 +114,43 @@ final class BookingController extends AbstractController
     public function checkOverlap(Request $request, BookingRepository $repository, UserRepository $userRepository): JsonResponse
     {
         $workerId = $request->request->get('worker');
-        $start = $request->request->get('start');
-        $end = $request->request->get('end');
+        $startRaw = $request->request->get('start');
+        $endRaw = $request->request->get('end');
 
-        $worker = $userRepository->find($workerId);
-        if (!$worker || !$start || !$end) {
-            return new JsonResponse(['overlap' => false, 'success' => false], 400);
+        $submittedToken = $request->request->get('_token');
+        // L'id 'booking_item' doit être le même que celui de BookingType !
+        if (!$this->isCsrfTokenValid('booking_item', $submittedToken)) {
+            return new JsonResponse([
+                'success' => false,
+                'error' => 'Jeton CSRF invalide'
+            ], 400);
         }
 
-        $hasOverlap = $repository->hasOverlappingBooking(
-            $worker,
-            new \DateTime($start),
-            new \DateTime($end)
-        );
 
-        return new JsonResponse(['overlap' => $hasOverlap]);
+
+        if (!is_numeric($workerId) || empty($startRaw) || empty($endRaw)) {
+            return new JsonResponse(['success' => false, 'error' => 'Paramètres manquants ou invalides'], 400);
+        }
+
+        $worker = $userRepository->find((int)$workerId);
+        if (!$worker) {
+            return new JsonResponse(['success' => false, 'error' => 'Travailleur introuvable'], 404);
+        }
+
+        try {
+            $start = new \DateTime($startRaw);
+            $end = new \DateTime($endRaw);
+        } catch (\Exception $e) {
+            return new JsonResponse(['success' => false, 'error' => 'Format de date invalide'], 400);
+        }
+
+        if ($start >= $end) {
+            return new JsonResponse(['success' => false, 'error' => 'La date de début doit précéder la date de fin'], 400);
+        }
+
+        $hasOverlap = $repository->hasOverlappingBooking($worker, $start, $end);
+
+        return new JsonResponse(['overlap' => $hasOverlap, 'success' => true]);
     }
 
 }

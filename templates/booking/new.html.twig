@@ -9,38 +9,3 @@
 
     <a href="{{ path('app_booking_index') }}">back to list</a>
 {% endblock %}
-
-{% block javascripts %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.querySelector('form'); // Adapte ce sélecteur si besoin
-            if (!form) return; // Sécurité
-
-            form.addEventListener('submit', function (e) {
-                // Récupère les valeurs ID/input du travailleur, start, end
-                const worker = document.querySelector('#booking_worker');
-                const start = document.querySelector('#booking_start');
-                const end = document.querySelector('#booking_end');
-
-                // Vérifier que tous les champs existent
-                if (!worker || !start || !end) return;
-
-                e.preventDefault(); // Bloque la soumission classique
-
-                fetch('{{ path('booking_check_overlap') }}', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: `worker=${worker.value}&start=${start.value}&end=${end.value}`
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.overlap) {
-                            alert("Cet employé a déjà un rendez-vous sur ce créneau.");
-                        } else {
-                            form.submit(); // Soumet vraiment si pas d’overlap
-                        }
-                    });
-            });
-        });
-    </script>
-{% endblock %}

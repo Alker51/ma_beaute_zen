@@ -50,6 +50,10 @@ class BookingType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Booking::class,
             'is_admin' => false,
+            'csrf_protection' => true,
+            'csrf_field_name' => '_token',
+            // L'ID ci-dessous doit être utilisé des deux côtés !
+            'csrf_token_id'   => 'booking_item',
         ]);
     }
 }
