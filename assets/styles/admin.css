@@ -9,9 +9,24 @@
     /*--border-radius: 0px;*/
 }
 
-.menu-item-return, .fa-solid{
+.menu-item-return, .fa-right-from-bracket{
     color: #ffffff !important;
     background-color: rgb(170, 0, 0) !important;
     border-radius: 5px !important;
     font-weight: bold;
+}
+
+.menu-item-home, .fa-door-open{
+    color: #ffffff !important;
+    background-color: rgb(209, 104, 0) !important;
+    border-radius: 5px !important;
+    font-weight: bold;
+}
+
+.menu-item-home, .menu-item-return {
+    margin : 5px;
+}
+
+.fa-right-from-bracket, .fa-door-open {
+    margin-left: 5px;
 }
