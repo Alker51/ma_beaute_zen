@@ -105,7 +105,9 @@ final class BookingController extends AbstractController
     #[Route('/{id}', name: 'show', methods: ['GET'])]
     public function show(Booking $booking): Response
     {
-        return $this->render('booking/show.html.twig', [
+        $view = 'booking/show.html.twig';
+
+        return $this->render($view, [
             'booking' => $booking,
         ]);
     }
@@ -113,6 +115,13 @@ final class BookingController extends AbstractController
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Booking $booking, EntityManagerInterface $entityManager): Response
     {
+        $view = 'booking/edit.html.twig';
+        $isAdminEdit = false;
+        if($this->isGranted('ROLE_ADMIN')) {
+            $view = 'admin/booking/edit.html.twig';
+            $isAdminEdit = true;
+        }
+
         $originalEmploye = $booking->getWorker();
 
         $form = $this->createForm(BookingType::class, $booking, [
@@ -127,7 +136,7 @@ final class BookingController extends AbstractController
                 $booking->setWorker($originalEmploye);
             }
 
-            $bookingGood = $this->checkOverlap($booking->getWorker(), $booking->getStart(), $booking->getEnd(), $entityManager->getRepository(Booking::class), $entityManager->getRepository(User::class));
+            $bookingGood = $this->checkOverlap($booking->getWorker(), $booking->getStart(), $booking->getEnd(), $entityManager->getRepository(Booking::class), $entityManager->getRepository(User::class), $isAdminEdit);
 
             if(!$bookingGood) {
                 return $this->redirectToRoute('app_error', ['title' => 'Le rendez-vous est indisponible.', 'message' => 'Nous sommes désolé mais le rendez-vous que vous avez demandé n\'est pas disponible, merci de sélectionner un autre pratiquant ou bien un horaire différent.'], Response::HTTP_SEE_OTHER);
@@ -137,7 +146,7 @@ final class BookingController extends AbstractController
             return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('booking/edit.html.twig', [
+        return $this->render($view, [
             'booking' => $booking,
             'form' => $form,
         ]);
@@ -154,8 +163,11 @@ final class BookingController extends AbstractController
         return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    public function checkOverlap(User $worker, \DateTimeInterface $startRaw, \DateTimeInterface $endRaw, BookingRepository $bookingRepository, UserRepository $userRepository): bool
+    public function checkOverlap(User $worker, \DateTimeInterface $startRaw, \DateTimeInterface $endRaw, BookingRepository $bookingRepository, UserRepository $userRepository, bool $isAnEdit = false): bool
     {
+        if($isAnEdit)
+            return true;
+
         try {
             $start = DateTime::createFromInterface($startRaw);
             $end = DateTime::createFromInterface($endRaw);
