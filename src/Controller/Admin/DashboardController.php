@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Booking;
 use App\Entity\Contact;
 use App\Entity\Image;
 use App\Entity\Produit;
@@ -65,14 +66,20 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         //yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
+        yield MenuItem::linkToCrud('Reservation', 'fa fa-business-time', Booking::class);
+
+        yield MenuItem::section('Gestion Clients');
         yield MenuItem::linkToCrud('Compte client', 'fa fa-user', User::class);
         yield MenuItem::linkToCrud('Demande client', 'fa fa-regular fa-circle-question', Contact::class);
-        yield MenuItem::linkToCrud('Taxe', 'fa fa-percent', Tax::class);
+
+        yield MenuItem::section('Gestion Produits & Services');
         yield MenuItem::linkToCrud('Produits', 'fa fa-box', Produit::class);
+        yield MenuItem::linkToCrud('Taxe', 'fa fa-percent', Tax::class);
         yield MenuItem::linkToCrud('Image', 'fa fa-images', Image::class);
-        yield MenuItem::section();
+
+        yield MenuItem::section('Administration');
+        yield MenuItem::linkToRoute('Retour à l\'accueil', 'fa fa-door-open', 'app_home')->setCssClass('menu-item-home');
         yield MenuItem::linkToLogout('Logout', 'fa-solid fa-right-from-bracket')->setCssClass('menu-item-return');
-        yield MenuItem::linkToRoute('Retour à l\'accueil', 'fa fa-door-open', 'app_home');
     }
 
     public function configureAssets(): Assets
