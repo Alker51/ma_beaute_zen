@@ -63,9 +63,7 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         //yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Reservation', 'fa fa-business-time', Booking::class);
-        yield MenuItem::linkToRoute('Calendrier (iframe) TEST', 'fa fa-bomb', 'admin_booking_calendar_iframe')->setCssClass('menu-item-test'); //calendar-days
-
+        yield MenuItem::linkToRoute('Rendez-vous', 'fa fa-calendar-days', 'admin_booking_calendar_iframe');
 
         yield MenuItem::section('Gestion Clients');
         yield MenuItem::linkToCrud('Compte client', 'fa fa-user', User::class);
