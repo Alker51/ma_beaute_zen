@@ -79,7 +79,7 @@ class DashboardController extends AbstractDashboardController
 
         yield MenuItem::section('Administration');
         yield MenuItem::linkToRoute('Retour à l\'accueil', 'fa fa-door-open', 'app_home')->setCssClass('menu-item-home');
-        yield MenuItem::linkToLogout('Logout', 'fa-solid fa-right-from-bracket')->setCssClass('menu-item-return');
+        yield MenuItem::linkToLogout('Déconnexion', 'fa-solid fa-right-from-bracket')->setCssClass('menu-item-return');
     }
 
     public function configureAssets(): Assets
