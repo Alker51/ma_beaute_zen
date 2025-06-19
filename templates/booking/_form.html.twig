@@ -9,7 +9,10 @@
 <script>
     flatpickr("input[type=datetime-local]", {
         enableTime: true,
+        locale: "fr",
         dateFormat: "Y-m-d\\TH:i",
+        altFormat: "\\L\\e d F Y \\à H:i",
+        altInput: true,
         time_24hr: true,
     });
 </script>
