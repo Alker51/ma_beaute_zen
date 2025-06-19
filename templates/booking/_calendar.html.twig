@@ -55,7 +55,25 @@
                 initialView: 'timeGridWeek', // Définit la vue par défaut à l'ouverture (vue semaine avec créneaux horaires)
                 editable: false, // Autorise l'utilisateur à déplacer / éditer les événements par drag & drop
                 eventOverlap: false, // Empêche le chevauchement de deux événements par drag & drop
+                allDaySlot: false,
                 height: '100%',
+                // Définir les heures minimales et maximales à afficher
+                slotMinTime: '08:00', // Heure minimale à afficher
+                slotMaxTime: '19:00', // Heure maximale à afficher
+                contentHeight: 'auto', // Ajuste la hauteur du contenu automatiquement
+                firstDay: 1,
+                businessHours: [
+                    {
+                        daysOfWeek: [1, 2, 3, 4, 5], // Lundi à Vendredi
+                        startTime: '09:00',
+                        endTime: '12:00'
+                    },
+                    {
+                        daysOfWeek: [1, 2, 3, 4, 5], // Lundi à Vendredi
+                        startTime: '13:00',
+                        endTime: '18:00'
+                    }
+                ],
                 // Définition des boutons personnalisés
                 customButtons: {
                     newEvent: { // Création d'un bouton personnalisé appelé 'newEvent'

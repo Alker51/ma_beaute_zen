@@ -11,12 +11,11 @@ use App\Repository\UserRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/booking')]
+#[Route('/booking', name: 'app_booking_')]
 final class BookingController extends AbstractController
 {
     private EmailController $emailService;
@@ -25,7 +24,7 @@ final class BookingController extends AbstractController
         $this->emailService = new EmailController();
     }
 
-    #[Route(name: 'app_booking_index', methods: ['GET'])]
+    #[Route(name: 'index', methods: ['GET'])]
     public function index(BookingRepository $bookingRepository): Response
     {
         return $this->render('booking/index.html.twig', [
@@ -33,13 +32,24 @@ final class BookingController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/calendar', name: 'app_booking_calendar')]
-    public function calendar(): Response
+    #[Route(path: '/calendar', name: 'calendar')]
+    public function calendar(BookingRepository $bookingRepository): Response
     {
-        return $this->render('booking/calendar.html.twig');
+        return $this->render('booking/calendar.html.twig', [
+            'bookings' => $bookingRepository->findAll(),
+        ]);
     }
 
-    #[Route('/new', name: 'app_booking_new', methods: ['GET', 'POST'])]
+    #[Route(path: '/calendarIframe', name: 'calendarIframe')]
+    public function calendarIframe(BookingRepository $bookingRepository): Response
+    {
+        return $this->render('booking/_calendar.html.twig', [
+                'bookings' => $bookingRepository->findAll(),
+            ]
+        );
+    }
+
+    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, StateRepository $stateRepository, UserRepository $userRepository): Response
     {
         $saisie = $request->getSession()->get('saisie_formulaire_rdv', []);
@@ -92,7 +102,7 @@ final class BookingController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_booking_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
     public function show(Booking $booking): Response
     {
         return $this->render('booking/show.html.twig', [
@@ -100,7 +110,7 @@ final class BookingController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_booking_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Booking $booking, EntityManagerInterface $entityManager): Response
     {
         $originalEmploye = $booking->getWorker();
@@ -133,7 +143,7 @@ final class BookingController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_booking_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, Booking $booking, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$booking->getId(), $request->getPayload()->getString('_token'))) {

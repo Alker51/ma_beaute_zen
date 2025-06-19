@@ -9,10 +9,7 @@ use App\Entity\Produit;
 use App\Entity\Tax;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
@@ -67,6 +64,8 @@ class DashboardController extends AbstractDashboardController
     {
         //yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Reservation', 'fa fa-business-time', Booking::class);
+        yield MenuItem::linkToRoute('Calendrier (iframe) TEST', 'fa fa-bomb', 'admin_booking_calendar_iframe')->setCssClass('menu-item-test'); //calendar-days
+
 
         yield MenuItem::section('Gestion Clients');
         yield MenuItem::linkToCrud('Compte client', 'fa fa-user', User::class);
