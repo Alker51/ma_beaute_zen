@@ -23,6 +23,13 @@
     font-weight: bold;
 }
 
+.menu-item-test, .fa-bomb{
+    color: #000000 !important;
+    background-color: rgb(248, 204, 2) !important;
+    border-radius: 5px !important;
+    font-weight: bold;
+}
+
 .menu-item-home, .menu-item-return {
     margin : 5px;
 }
