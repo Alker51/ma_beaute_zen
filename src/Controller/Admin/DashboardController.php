@@ -64,6 +64,7 @@ class DashboardController extends AbstractDashboardController
     {
         //yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToRoute('Rendez-vous', 'fa fa-calendar-days', 'admin_booking_calendar_iframe');
+        yield MenuItem::linkToCrud('Tableau Rendez-vous', 'fa fa-calendar-days', Booking::class);
 
         yield MenuItem::section('Gestion Clients');
         yield MenuItem::linkToCrud('Compte client', 'fa fa-user', User::class);
