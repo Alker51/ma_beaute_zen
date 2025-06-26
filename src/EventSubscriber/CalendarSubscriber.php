@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use App\Controller\StateController;
 use App\Repository\BookingRepository;
 use CalendarBundle\Entity\Event;
 use CalendarBundle\Event\SetDataEvent;
@@ -42,19 +43,25 @@ class CalendarSubscriber implements EventSubscriberInterface
         foreach ($bookings as $booking) {
             // this create the events with your data (here booking data) to fill calendar
             $bookingEvent = new Event(
-                $booking->getTitle(),
+                $booking->getCustomer()->getFullName()  . ' - ' . $booking->getState()->getName(),
                 $booking->getStart(),
-                $booking->getEnd() // If the end date is null or not defined, a all day event is created.
+                $booking->getEnd(), // If the end date is null or not defined, a all day event is created.
+                null,
+                ['stateId' => $booking->getState()->getId()],
             );
 
+
+            $backgroundcolor = new StateController()->getColorByState($bookingEvent->getOption('stateId'));
+            $textColor = new StateController()->getTextColorByState($bookingEvent->getOption('stateId'));
             /*
              * Add custom options to events
              *
              * For more information see: https://fullcalendar.io/docs/event-object
              */
             $bookingEvent->setOptions([
-                'backgroundColor' => 'red',
-                'borderColor' => 'red',
+                'backgroundColor' => $backgroundcolor,
+                'borderColor' => $backgroundcolor,
+                'textColor' => $textColor,
             ]);
             $bookingEvent->addOption(
                 'url',
