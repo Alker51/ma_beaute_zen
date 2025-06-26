@@ -4,19 +4,18 @@
             text-transform: capitalize; /* Met la première lettre du titre du calendrier en majuscule */
         }
 
+        :root {
+            --fc-now-indicator-color: #2ad300; /* Couleur de l'indicateur de temps */
+        }
+
         html, body {
             height: 100%;            /* Nécessaire pour que 100% fonctionne en profondeur */
             margin: 0;
             padding: 0;
         }
 
-
-        #calendar-holder {
-            height: 100vh;           /* Prend toute la hauteur de la fenêtre */
-        }
-
         .fc {
-            height: 100% !important; /* Force FullCalendar à utiliser toute la hauteur de son parent */
+            height: auto !important; /* Force FullCalendar à utiliser toute la hauteur de son parent */
         }
 
         .fc-button {
@@ -32,7 +31,20 @@
             background-color: #037e0b !important;
         }
 
+        .fc-timegrid-now-indicator-container {
+            overflow: visible !important;
+            /* Tu peux éventuellement augmenter le z-index pour la voir passer devant */
+        }
 
+        .fc-timegrid-now-indicator-arrow,
+        .fc-timegrid-now-indicator-line {
+            display: block !important;
+            z-index: 9999 !important;
+        }
+
+        .fc-timegrid-now-indicator-line {
+            border-width: 2px 0 0 !important;
+        }
     </style>
 
     <div id="calendar-holder"></div> <!-- Élément HTML qui va contenir le calendrier FullCalendar -->
@@ -56,7 +68,7 @@
                 editable: false, // Autorise l'utilisateur à déplacer / éditer les événements par drag & drop
                 eventOverlap: false, // Empêche le chevauchement de deux événements par drag & drop
                 allDaySlot: false,
-                height: '100%',
+                height: 'auto',
                 nowIndicator: true,
                 // Définir les heures minimales et maximales à afficher
                 slotMinTime: '08:00', // Heure minimale à afficher
@@ -105,7 +117,7 @@
                     center: 'title', // Affiche le titre du calendrier au centre
                     right: 'dayGridMonth,timeGridWeek,timeGridDay', // Boutons affichés à droite (vue mois, semaine, jour)
                 },
-                timeZone: 'UTC', // Définit le fuseau horaire (ici UTC)
+                timeZone: 'Europe/Paris', // Définit le fuseau horaire (ici UTC)
                 // Personnalisation du texte des boutons de vue et "aujourd'hui"
                 buttonText: {
                     today:    'Aujourd\'hui',
