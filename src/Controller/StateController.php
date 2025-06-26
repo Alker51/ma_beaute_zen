@@ -24,4 +24,28 @@ final class StateController extends AbstractController
             'controller_name' => 'StateController',
         ]);
     }
+
+    public function getBootstrapColorByState(int $state): string
+    {
+        switch ($state) {
+            case self::PENDING_STATE:
+                $color = 'info';
+            case self::FINISH_STATE:
+                $color = 'success';
+            case self::DISCONTINUED_STATE:
+                $color = 'danger';
+            case self::VALIDATED_STATE:
+                $color = 'success';
+            case self::PENDING_VALIDATION_STATE:
+                $color = 'info';
+            case self::REFUSE_STATE:
+                $color = 'danger';
+            case self::EXECUTED_STATE:
+                $color = 'primary';
+            case self::CANCEL_STATE:
+                $color = 'danger';
+        }
+
+        return $color;
+    }
 }
