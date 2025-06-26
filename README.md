@@ -168,6 +168,66 @@ Utilisez les commandes suivantes avec `composer` pour gérer le projet rapidemen
   composer db_purge
   ```
 
+# ✨ Personnalisation rapide du Calendar Bundle
+
+## 1️⃣  Personnaliser les événements affichés
+
+- **Fichier à modifier :**  
+  `src/EventSubscriber/CalendarSubscriber.php`
+- **Que faire :**
+    - Modifier la requête pour afficher les bons événements selon votre logique.
+    - Personnaliser les objets `Event` : titre, dates, couleurs, URL, etc.
+
+---
+
+## 🎨 Personnaliser le style du calendrier (CSS)
+
+- **Fichier à modifier :**  
+  `templates/_calendar.html.twig`
+- **Que faire :**
+    - Modifier la section `<style>` pour adapter le design : couleurs, boutons, etc.
+
+---
+
+## ⚙️ Modifier le comportement ou les options du calendrier (JavaScript/FullCalendar)
+
+- **Fichier à modifier :**  
+  `templates/_calendar.html.twig` (dans le bloc `<script>`)
+- **Que faire :**
+    - Changer les options FullCalendar : vue, horaires, toolbar, langue, etc.
+    - Ajouter des boutons personnalisés (ex : "Ajouter un événement").
+
+---
+
+## 🔗 Configurer la source des événements
+
+- **Fichier à modifier :**  
+  `templates/_calendar.html.twig` (option `eventSources`)
+- **Que faire :**
+    - Modifier l’URL de récupération des événements et les paramètres envoyés.
+
+---
+
+## 🧩 Gérer l’interactivité et ajouter des filtres
+
+- **Fichiers à modifier :**
+    - `templates/_calendar.html.twig` (JavaScript)
+    - Backend (`CalendarSubscriber`, controller, etc.)
+- **Que faire :**
+    - Ajouter des filtres côté JS et les transmettre au backend, puis adapter le backend pour les utiliser.
+
+---
+
+## 📝 Résumé
+
+| Personnalisation              | Fichier à modifier                        |
+|------------------------------|-------------------------------------------|
+| 🗓️ Événements affichés        | `CalendarSubscriber.php` (backend)        |
+| 🎨 Style visuel (CSS)         | `_calendar.html.twig` (section `<style>`) |
+| ⚙️ Options et comportement    | `_calendar.html.twig` (section `<script>`)|
+| 🔗 Source/URL des événements  | `_calendar.html.twig` (`eventSources`)    |
+| 🧩 Filtres et interactivité   | `_calendar.html.twig` + backend           |
+
 ---
 
 ## Structure des dossiers principaux
