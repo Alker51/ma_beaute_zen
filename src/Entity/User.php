@@ -404,4 +404,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->getFirstName() . ' ' . $this->getLastName();
     }
 
+    public function __toString() :string
+    {
+        return $this->getFullName();
+    }
 }

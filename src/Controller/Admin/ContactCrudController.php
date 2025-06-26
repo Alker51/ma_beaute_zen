@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\StateController;
 use App\Entity\Contact;
 use DateTime;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -36,15 +37,7 @@ class ContactCrudController extends AbstractCrudController
             AssociationField::new('state', 'État de la demande')
                 ->formatValue(function ($value, $entity) {
                     $state = $entity->getState();
-
-                    if($state->getId() === 1){
-                        $color = "info";
-                    }elseif ($state->getId() === 2){
-                        $color = "success";
-                    }else{
-                        $color = "danger";
-                    }
-
+                    $color = new StateController()->getBootstrapColorByState($state->getId());
 
                     return '<span class="badge badge-'.$color.'">' . $state->getName() . '</span>';
                 }),

@@ -28,22 +28,23 @@ final class StateController extends AbstractController
     public function getBootstrapColorByState(int $state): string
     {
         switch ($state) {
+            case self::PENDING_VALIDATION_STATE:
             case self::PENDING_STATE:
                 $color = 'info';
+                break;
+            case self::VALIDATED_STATE:
+            case self::EXECUTED_STATE:
             case self::FINISH_STATE:
                 $color = 'success';
+                break;
+            case self::REFUSE_STATE:
+            case self::CANCEL_STATE:
             case self::DISCONTINUED_STATE:
                 $color = 'danger';
-            case self::VALIDATED_STATE:
-                $color = 'success';
-            case self::PENDING_VALIDATION_STATE:
-                $color = 'info';
-            case self::REFUSE_STATE:
-                $color = 'danger';
-            case self::EXECUTED_STATE:
+                break;
+            default:
                 $color = 'primary';
-            case self::CANCEL_STATE:
-                $color = 'danger';
+                break;
         }
 
         return $color;
