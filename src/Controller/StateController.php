@@ -49,4 +49,48 @@ final class StateController extends AbstractController
 
         return $color;
     }
+
+    public  function getColorByState(int $state): string
+    {
+        switch ($state) {
+            case self::PENDING_VALIDATION_STATE:
+            case self::PENDING_STATE:
+                $color = "#FFCC00";
+                break;
+            case self::VALIDATED_STATE:
+            case self::EXECUTED_STATE:
+            case self::FINISH_STATE:
+                $color = '#006600';
+                break;
+            case self::REFUSE_STATE:
+            case self::CANCEL_STATE:
+            case self::DISCONTINUED_STATE:
+                $color = '#CC0000';
+                break;
+            default:
+                $color = '#6699FF';
+                break;
+        }
+
+        return $color;
+    }
+
+    public  function getTextColorByState(int $state): string
+    {
+        switch ($state) {
+            case self::VALIDATED_STATE:
+            case self::EXECUTED_STATE:
+            case self::DISCONTINUED_STATE:
+            case self::CANCEL_STATE:
+            case self::REFUSE_STATE:
+            case self::FINISH_STATE:
+                $color = '#FFFFFF';
+                break;
+            default:
+                $color = '#000000';
+                break;
+        }
+
+        return $color;
+    }
 }
