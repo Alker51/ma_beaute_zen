@@ -73,7 +73,7 @@ class BookingCrudController extends AbstractCrudController
             ->addCssClass('validate-btn')
             ->displayIf(static function ($entity) {
                 // Afficher uniquement sur les bookings qui ne sont pas déjà validés, par exemple :
-                return $entity->getState()->getName() !== 'Validé';
+                return $entity->getState()->getID() !== '4';
             });
 
         return $actions
