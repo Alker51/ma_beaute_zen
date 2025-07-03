@@ -112,6 +112,52 @@ final class BookingController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/iframe/show/', name: 'showIframe', methods: ['GET'])]
+    public function showIframe(Booking $booking): Response
+    {
+        return $this->render('booking//iframe/showIframe.html.twig', [
+            'booking' => $booking,
+        ]);
+    }
+
+    #[Route('/{id}/iframe/edit', name: 'editIframe', methods: ['GET', 'POST'])]
+    public function editIframe(Request $request, Booking $booking, EntityManagerInterface $entityManager): Response
+    {
+        $isAdminEdit = false;
+        if($this->isGranted('ROLE_ADMIN')) {
+            $isAdminEdit = true;
+        }
+
+        $originalEmploye = $booking->getWorker();
+
+        $form = $this->createForm(BookingType::class, $booking, [
+                'is_admin' => $this->isGranted('ROLE_ADMIN'),
+            ]
+        );
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if (!$this->isGranted('ROLE_ADMIN')) {
+                // Empêche la modification de l’employé si pas modifié par un admin — on remet la valeur d'origine
+                $booking->setWorker($originalEmploye);
+            }
+
+            $bookingGood = $this->checkOverlap($booking->getWorker(), $booking->getStart(), $booking->getEnd(), $entityManager->getRepository(Booking::class), $entityManager->getRepository(User::class), $isAdminEdit);
+
+            if(!$bookingGood) {
+                return $this->redirectToRoute('app_error', ['title' => 'Le rendez-vous est indisponible.', 'message' => 'Nous sommes désolé mais le rendez-vous que vous avez demandé n\'est pas disponible, merci de sélectionner un autre pratiquant ou bien un horaire différent.'], Response::HTTP_SEE_OTHER);
+            }
+
+            $entityManager->flush();
+            return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('booking/iframe/editIframe.html.twig', [
+            'booking' => $booking,
+            'form' => $form,
+        ]);
+    }
+
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Booking $booking, EntityManagerInterface $entityManager): Response
     {
@@ -152,13 +198,20 @@ final class BookingController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, Booking $booking, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$booking->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($booking);
             $entityManager->flush();
         }
+
+        $fromIframe = $request->request->get('from_iframe', '0'); // '1' ou '0'
+        $fromIframeBool = $fromIframe === '1';
+
+
+        if($fromIframeBool)
+            return $this->redirectToRoute('app_booking_calendarIframe', [], Response::HTTP_SEE_OTHER);
 
         return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
     }
