@@ -187,9 +187,9 @@ final class BookingController extends AbstractController
         return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    public function checkOverlap(User $worker, \DateTimeInterface $startRaw, \DateTimeInterface $endRaw, BookingRepository $bookingRepository, UserRepository $userRepository, bool $isAnEdit = false): bool
+    public function checkOverlap(User|null $worker, \DateTimeInterface $startRaw, \DateTimeInterface $endRaw, BookingRepository $bookingRepository, UserRepository $userRepository, bool $isAnEdit = false): bool
     {
-        if($isAnEdit)
+        if($isAnEdit || $worker === null)
             return true;
 
         try {

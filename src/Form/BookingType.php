@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Booking;
+use App\Entity\State;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -40,6 +41,15 @@ class BookingType extends AbstractType
                 'choice_label' => 'fullName',
                 'required' => false, // permet la sélection de "Aucun" (null)
                 'placeholder' => 'Aucun',
+                'label' => 'Employé(e) attribué(e)'
+            ]);
+
+            $builder->add('state', EntityType::class, [
+                'class' => State::class,
+                'choice_label' => 'name',
+                'required' => true, // permet la sélection de "Aucun" (null)
+                'placeholder' => 'Aucun',
+                'label' => 'Statut'
             ]);
         }
 
