@@ -69,7 +69,9 @@ class BookingCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         $valider = Action::new('valider', 'Valider', 'fa fa-check')
-            ->linkToCrudAction('validerBooking')
+            ->linkToCrudAction('validerBooking', function ($entity) {
+                return ['entityId' => $entity->getId()];
+            })
             ->addCssClass('validate-btn')
             ->displayIf(static function ($entity) {
                 // Afficher uniquement sur les bookings qui ne sont pas déjà validés, par exemple :
@@ -84,8 +86,21 @@ class BookingCrudController extends AbstractCrudController
 
     public function validerBooking(AdminContext $context, EntityManagerInterface $entityManager,StateRepository $stateRepository): RedirectResponse
     {
-        /** @var Booking $booking */
-        $booking = $context->getEntity()->getInstance();
+        // Si jamais le contexte ne donne pas d'entité !
+        $entityId = $context->getRequest()->query->get('entityId');
+        if (!$entityId) {
+            $this->addFlash('danger', "Rendez-vous non trouvé !");
+            return $this->redirectToRoute('admin_booking_index');
+        }
+        /** @var Booking|null $booking */
+        $booking = $entityManager->getRepository(Booking::class)->find($entityId);
+        if (!$booking) {
+            $this->addFlash('danger', "Rendez-vous introuvable !");
+            return $this->redirectToRoute('admin_booking_index');
+        }
+
+
+
 
         $stateValide = 4;
         $booking->setState($stateRepository->findOneBy(['id' => $stateValide]));;
@@ -95,7 +110,7 @@ class BookingCrudController extends AbstractCrudController
 
         $this->addFlash('success', 'Le rendez-vous a été validé.');
 
-        return $this->redirect($context->getReferrer());
+        return $this->redirectToRoute('admin_booking_index');
     }
 
 }
