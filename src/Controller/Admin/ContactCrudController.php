@@ -149,9 +149,7 @@ class ContactCrudController extends AbstractCrudController
 
 
         return $actions
-            ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
-                return $action->setLabel('Nouvelle demande client'); // Remplacer le texte
-            })
+            ->disable(Action::NEW)
             ->add(Crud::PAGE_INDEX, $detailAction)
             ->add(Crud::PAGE_DETAIL, $reply)
             ->add(Crud::PAGE_EDIT, $reply)

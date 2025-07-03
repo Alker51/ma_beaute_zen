@@ -30,6 +30,12 @@
     font-weight: bold;
 }
 
+a.validate-btn, a.btn.validate-btn i
+
+{
+    color: #026e00 !important;
+}
+
 .menu-item-home, .menu-item-return {
     margin : 5px;
 }

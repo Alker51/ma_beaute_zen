@@ -4,13 +4,17 @@ namespace App\Controller\Admin;
 
 use App\Controller\StateController;
 use App\Entity\Booking;
+use App\Repository\StateRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -61,4 +65,37 @@ class BookingCrudController extends AbstractCrudController
             }),
         ];
     }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        $valider = Action::new('valider', 'Valider', 'fa fa-check')
+            ->linkToCrudAction('validerBooking')
+            ->addCssClass('validate-btn')
+            ->displayIf(static function ($entity) {
+                // Afficher uniquement sur les bookings qui ne sont pas déjà validés, par exemple :
+                return $entity->getState()->getName() !== 'Validé';
+            });
+
+        return $actions
+            ->add(Crud::PAGE_DETAIL, $valider)
+            ->add(Crud::PAGE_INDEX, $valider);
+
+    }
+
+    public function validerBooking(AdminContext $context, EntityManagerInterface $entityManager,StateRepository $stateRepository): RedirectResponse
+    {
+        /** @var Booking $booking */
+        $booking = $context->getEntity()->getInstance();
+
+        $stateValide = 4;
+        $booking->setState($stateRepository->findOneBy(['id' => $stateValide]));;
+
+        $entityManager->persist($booking);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Le rendez-vous a été validé.');
+
+        return $this->redirect($context->getReferrer());
+    }
+
 }
