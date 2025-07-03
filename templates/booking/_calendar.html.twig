@@ -103,7 +103,7 @@
                         text: 'Ajouter un évènement', // Libellé du bouton
                         click: function () {
                             // Quand on clique dessus, on redirige vers la page de création d'évènement
-                            window.location.href = "{{ path('app_booking_new') }}";
+                            window.location.href = "{{ path('app_booking_new', {'from_iframe': 1}) }}";
                         }
                     }
                 },

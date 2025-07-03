@@ -53,8 +53,9 @@ final class BookingController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager, StateRepository $stateRepository, UserRepository $userRepository): Response
     {
         $saisie = $request->getSession()->get('saisie_formulaire_rdv', []);
+        $fromIframe = $request->get('from_iframe', '0');
+        $fromIframeBool = $fromIframe === '1';
 
-        //$request->getSession()->remove('saisie_formulaire_rdv');
         $booking = new Booking();
 
         if(!empty($saisie)) {
@@ -93,8 +94,17 @@ final class BookingController extends AbstractController
             $entityManager->persist($booking);
             $entityManager->flush();
 
+            if($fromIframeBool)
+                return $this->redirectToRoute('app_booking_calendarIframe', [], Response::HTTP_SEE_OTHER);
+
             return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
         }
+
+        if($fromIframeBool)
+            return $this->render('booking/iframe/newIframe.html.twig', [
+                'booking' => $booking,
+                'form' => $form,
+            ]);
 
         return $this->render('booking/new.html.twig', [
             'booking' => $booking,
