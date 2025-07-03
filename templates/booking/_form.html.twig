@@ -7,6 +7,11 @@
 {{ form_end(form) }}
 
 <script>
+    const now = new Date();
+
+    let dateforFlatprickrStart = now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
+    let dateforFlatprickrEnd = now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate() + " " + (now.getHours()+1) + ":" + now.getMinutes();
+
     flatpickr("input[type=datetime-local]", {
         enableTime: true,
         locale: "fr",
@@ -15,4 +20,26 @@
         altInput: true,
         time_24hr: true,
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr("#booking_start", {
+            enableTime: true,
+            locale: "fr",
+            dateFormat: "Y-m-d\\TH:i",
+            altFormat: "\\L\\e d F Y \\à H:i",
+            altInput: true,
+            time_24hr: true,
+            defaultDate: dateforFlatprickrStart,
+        });
+        flatpickr("#booking_end", {
+            enableTime: true,
+            locale: "fr",
+            dateFormat: "Y-m-d\\TH:i",
+            altFormat: "\\L\\e d F Y \\à H:i",
+            altInput: true,
+            time_24hr: true,
+            defaultDate: dateforFlatprickrEnd,
+        });
+    });
+
 </script>
