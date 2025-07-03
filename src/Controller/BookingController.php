@@ -157,6 +157,9 @@ final class BookingController extends AbstractController
             }
 
             $entityManager->flush();
+
+            if($this->checkIfIframe($request))
+                return $this->redirectToRoute('app_booking_calendarIframe', [], Response::HTTP_SEE_OTHER);
             return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
         }
 
