@@ -1,8 +1,9 @@
 {{ form_start(form) }}
-    {{ form_row(form.title) }}
-    {{ form_row(form.start) }}
+    {{ form_row(form.title, { label: 'Titre du rendez-vous' }) }}
+    {{ form_row(form.start, { label: 'Date & Heure de début' }) }}
+    {{ form_row(form.end, { label: 'Date & Heure de fin' }) }}
     {{ form_row(form._token) }}
-    {{ form_row(form.end) }}
+    {{ form_row(form.worker, { label: 'Employé assigné à ce rendez-vous' }) }}
 <button class="btn btn-success" type="submit">Confirmer</button>
 {{ form_end(form) }}
 
