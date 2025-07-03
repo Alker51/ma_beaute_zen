@@ -53,9 +53,6 @@ final class BookingController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager, StateRepository $stateRepository, UserRepository $userRepository): Response
     {
         $saisie = $request->getSession()->get('saisie_formulaire_rdv', []);
-        $fromIframe = $request->get('from_iframe', '0');
-        $fromIframeBool = $fromIframe === '1';
-
         $booking = new Booking();
 
         if(!empty($saisie)) {
@@ -94,13 +91,13 @@ final class BookingController extends AbstractController
             $entityManager->persist($booking);
             $entityManager->flush();
 
-            if($fromIframeBool)
+            if($this->checkIfIframe($request))
                 return $this->redirectToRoute('app_booking_calendarIframe', [], Response::HTTP_SEE_OTHER);
 
             return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        if($fromIframeBool)
+        if($this->checkIfIframe($request))
             return $this->render('booking/iframe/newIframe.html.twig', [
                 'booking' => $booking,
                 'form' => $form,
@@ -113,58 +110,15 @@ final class BookingController extends AbstractController
     }
 
     #[Route('/{id}', name: 'show', methods: ['GET'])]
-    public function show(Booking $booking): Response
+    public function show(Booking $booking, Request $request): Response
     {
         $view = 'booking/show.html.twig';
 
+        if($this->checkIfIframe($request))
+            $view = 'booking/iframe/showIframe.html.twig';
+
         return $this->render($view, [
             'booking' => $booking,
-        ]);
-    }
-
-    #[Route('/{id}/iframe/show/', name: 'showIframe', methods: ['GET'])]
-    public function showIframe(Booking $booking): Response
-    {
-        return $this->render('booking//iframe/showIframe.html.twig', [
-            'booking' => $booking,
-        ]);
-    }
-
-    #[Route('/{id}/iframe/edit', name: 'editIframe', methods: ['GET', 'POST'])]
-    public function editIframe(Request $request, Booking $booking, EntityManagerInterface $entityManager): Response
-    {
-        $isAdminEdit = false;
-        if($this->isGranted('ROLE_ADMIN')) {
-            $isAdminEdit = true;
-        }
-
-        $originalEmploye = $booking->getWorker();
-
-        $form = $this->createForm(BookingType::class, $booking, [
-                'is_admin' => $this->isGranted('ROLE_ADMIN'),
-            ]
-        );
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->isGranted('ROLE_ADMIN')) {
-                // Empêche la modification de l’employé si pas modifié par un admin — on remet la valeur d'origine
-                $booking->setWorker($originalEmploye);
-            }
-
-            $bookingGood = $this->checkOverlap($booking->getWorker(), $booking->getStart(), $booking->getEnd(), $entityManager->getRepository(Booking::class), $entityManager->getRepository(User::class), $isAdminEdit);
-
-            if(!$bookingGood) {
-                return $this->redirectToRoute('app_error', ['title' => 'Le rendez-vous est indisponible.', 'message' => 'Nous sommes désolé mais le rendez-vous que vous avez demandé n\'est pas disponible, merci de sélectionner un autre pratiquant ou bien un horaire différent.'], Response::HTTP_SEE_OTHER);
-            }
-
-            $entityManager->flush();
-            return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('booking/iframe/editIframe.html.twig', [
-            'booking' => $booking,
-            'form' => $form,
         ]);
     }
 
@@ -172,6 +126,10 @@ final class BookingController extends AbstractController
     public function edit(Request $request, Booking $booking, EntityManagerInterface $entityManager): Response
     {
         $view = 'booking/edit.html.twig';
+
+        if($this->checkIfIframe($request))
+            $view = 'booking/iframe/editIframe.html.twig';
+
         $isAdminEdit = false;
         if($this->isGranted('ROLE_ADMIN')) {
             $view = 'admin/booking/edit.html.twig';
@@ -249,6 +207,12 @@ final class BookingController extends AbstractController
         }
 
         return true;
+    }
+
+    private function checkIfIframe(Request $request) : bool
+    {
+        $fromIframe = $request->get('from_iframe', '0');
+        return $fromIframe === '1';
     }
 
 }
