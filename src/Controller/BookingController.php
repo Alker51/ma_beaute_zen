@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Booking;
+use App\Entity\State;
 use App\Entity\User;
 use App\Form\BookingType;
 use App\Repository\BookingRepository;
@@ -218,4 +219,30 @@ final class BookingController extends AbstractController
         return $fromIframe === '1';
     }
 
+    #[Route('/validate/{id}', name: 'validate', methods: ['GET'])]
+    public function validateBooking(Booking $booking, EntityManagerInterface $entityManager, StateRepository $stateRepository, Request $request) : Response
+    {
+        $stateBooking = $booking->getState();
+        $stateCanBeValidated = [1,5];
+
+        if(in_array($stateBooking->getId(), $stateCanBeValidated)) {
+
+            $booking->setState($stateRepository->findOneBy(['id' => StateController::VALIDATED_STATE]));
+
+            $entityManager->persist($booking);
+            $entityManager->flush();
+        } else {
+            $error = 'Impossible de valider le rendez-vous. L`état du rendez-vous n\'est pas valide. Un Rendez-vous "' . $stateBooking->getName().'" ne peux être validé.';
+
+            return $this->render('home/error.html.twig', [
+                'title' => 'Impossible de valider le rendez-vous.',
+                'message' => $error,
+            ]);
+        }
+
+        if($this->checkIfIframe($request))
+            return $this->redirectToRoute('app_booking_calendarIframe', [], Response::HTTP_SEE_OTHER);
+
+        return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
+    }
 }

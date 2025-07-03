@@ -31,6 +31,7 @@
             {% if is_granted('ROLE_ADMIN') %}
                 <a class="btn btn-warning" href="{{ path('app_booking_edit', {'id': booking.id, 'from_iframe': 1}) }}">Modifier le rendez-vous.</a>
                 {% include('booking/_delete_form.html.twig') with {'fromIframe': true} %}
+                <a class="btn btn-success" href="{{ path('app_booking_validate', {'id': booking.id, 'from_iframe': 1}) }}">Confirmer le rendez-vous.</a>
             {% endif %}
         {% endif %}
 
