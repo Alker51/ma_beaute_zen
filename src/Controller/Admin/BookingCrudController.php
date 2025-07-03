@@ -45,11 +45,17 @@ class BookingCrudController extends AbstractCrudController
                 ->formatValue(function ($value, $entity) {
                 $worker = $entity->getWorker();
 
+                if($worker === null)
+                    return null;
+
                 return $worker->getFirstName() . ' ' . $worker->getLastName();
             }),
             AssociationField::new('customer', 'Compte Client')
                 ->formatValue(function ($value, $entity) {
-                $worker = $entity->getWorker();
+                $worker = $entity->getCustomer();
+
+                if($worker === null)
+                    return null;
 
                 return $worker->getFirstName() . ' ' . $worker->getLastName();
             }),
