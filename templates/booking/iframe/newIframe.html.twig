@@ -1,0 +1,9 @@
+{% extends 'baseIframe.html.twig' %}
+
+{% block body %}
+    <h1>Création d'un Rendez-vous</h1>
+
+    {{ include('booking/_form.html.twig') }}
+
+    <a class="btn btn-info" href="{{ path('app_booking_calendarIframe') }}">Retour</a>
+{% endblock %}

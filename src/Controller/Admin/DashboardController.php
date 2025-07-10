@@ -9,10 +9,7 @@ use App\Entity\Produit;
 use App\Entity\Tax;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
@@ -66,18 +63,20 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         //yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Reservation', 'fa fa-business-time', Booking::class);
+        yield MenuItem::section('Gestion Rendez-Vous', 'fa-solid fa-calendar');
+        yield MenuItem::linkToRoute('Rendez-vous', 'fa fa-calendar-week', 'admin_booking_calendar_iframe');
+        yield MenuItem::linkToCrud('Liste Rendez-vous', 'fa fa-table-list', Booking::class);
 
-        yield MenuItem::section('Gestion Clients');
-        yield MenuItem::linkToCrud('Compte client', 'fa fa-user', User::class);
-        yield MenuItem::linkToCrud('Demande client', 'fa fa-regular fa-circle-question', Contact::class);
+        yield MenuItem::section('Gestion Clients', 'fa fa-user-gear');;
+        yield MenuItem::linkToCrud('Compte client', 'fa fa-users', User::class);
+        yield MenuItem::linkToCrud('Demande client', 'fa fa-person-circle-question', Contact::class);
 
-        yield MenuItem::section('Gestion Produits & Services');
+        yield MenuItem::section('Gestion Produits & Services', 'fa fa-tag');;
         yield MenuItem::linkToCrud('Produits', 'fa fa-box', Produit::class);
         yield MenuItem::linkToCrud('Taxe', 'fa fa-percent', Tax::class);
         yield MenuItem::linkToCrud('Image', 'fa fa-images', Image::class);
 
-        yield MenuItem::section('Administration');
+        yield MenuItem::section('Administration', 'fa fa-cogs');;
         yield MenuItem::linkToRoute('Retour à l\'accueil', 'fa fa-door-open', 'app_home')->setCssClass('menu-item-home');
         yield MenuItem::linkToLogout('Déconnexion', 'fa-solid fa-right-from-bracket')->setCssClass('menu-item-return');
     }

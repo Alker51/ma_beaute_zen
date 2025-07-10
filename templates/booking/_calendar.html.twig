@@ -1,0 +1,145 @@
+{% block body %}
+    <style>
+        .fc-toolbar-title {
+            text-transform: capitalize; /* Met la première lettre du titre du calendrier en majuscule */
+        }
+
+        :root {
+            --fc-now-indicator-color: #2ad300; /* Couleur de l'indicateur de temps */
+        }
+
+        html, body {
+            height: 100%;            /* Nécessaire pour que 100% fonctionne en profondeur */
+            margin: 0;
+            padding: 0;
+        }
+
+        .fc {
+            height: auto !important; /* Force FullCalendar à utiliser toute la hauteur de son parent */
+        }
+
+        .fc-button {
+            color: #fff !important;                  /* Couleur du texte */
+            border: none !important;                 /* Supprime la bordure */
+            border-radius: 6px !important;           /* Bords arrondis */
+            padding: 8px 16px !important;            /* Espace interne */
+            margin: 0 1px !important;
+            font-weight: bold !important;
+        }
+
+        .fc-direction-ltr .fc-timegrid-col-events {
+            margin: 0px 2% 0px 2%;
+        }
+
+        .fc-newEvent-button {
+            background-color: #037e0b !important;
+        }
+
+        .fc-timegrid-now-indicator-container {
+            overflow: visible !important;
+            /* Tu peux éventuellement augmenter le z-index pour la voir passer devant */
+        }
+
+        .fc-timegrid-now-indicator-arrow,
+        .fc-timegrid-now-indicator-line {
+            display: block !important;
+            z-index: 9999 !important;
+        }
+
+        .fc-timegrid-now-indicator-line {
+            border-width: 2px 0 0 !important;
+        }
+
+        /* Rendez les événements passés plus transparents et gris */
+        .fc-event-past {
+            opacity: 0.5;               /* Rend l'événement plus transparent */
+        }
+
+    </style>
+
+    <div id="calendar-holder"></div> <!-- Élément HTML qui va contenir le calendrier FullCalendar -->
+{% endblock %}
+
+{% block javascripts %}
+    <!-- Inclusion de la librairie FullCalendar et de la langue française -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales/fr.global.min.js"></script>
+
+    <script type="text/javascript">
+        // Quand le DOM est complètement chargé
+        document.addEventListener('DOMContentLoaded', () => {
+            // On récupère l'élément qui contiendra le calendrier
+            const calendarEl = document.getElementById('calendar-holder');
+
+            // On initialise un nouvel objet FullCalendar sur l'élément récupéré
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                locale: 'fr', // Définit la langue du calendrier en français
+                initialView: 'timeGridWeek', // Définit la vue par défaut à l'ouverture (vue semaine avec créneaux horaires)
+                editable: false, // Autorise l'utilisateur à déplacer / éditer les événements par drag & drop
+                eventOverlap: false, // Empêche le chevauchement de deux événements par drag & drop
+                allDaySlot: false,
+                height: 'auto',
+                nowIndicator: true,
+                // Définir les heures minimales et maximales à afficher
+                slotMinTime: '06:00', // Heure minimale à afficher
+                slotMaxTime: '21:00', // Heure maximale à afficher
+                contentHeight: 'auto', // Ajuste la hauteur du contenu automatiquement
+                firstDay: 1,
+                businessHours: [
+                    {
+                        daysOfWeek: [1, 2, 3, 4, 5], // Lundi à Vendredi
+                        startTime: '09:00',
+                        endTime: '12:00'
+                    },
+                    {
+                        daysOfWeek: [1, 2, 3, 4, 5], // Lundi à Vendredi
+                        startTime: '13:00',
+                        endTime: '18:00'
+                    }
+                ],
+                // Définition des boutons personnalisés
+                customButtons: {
+                    newEvent: { // Création d'un bouton personnalisé appelé 'newEvent'
+                        text: 'Ajouter un évènement', // Libellé du bouton
+                        click: function () {
+                            // Quand on clique dessus, on redirige vers la page de création d'évènement
+                            window.location.href = "{{ path('app_booking_new', {'from_iframe': 1}) }}";
+                        }
+                    }
+                },
+                // Source de récupération des événements (depuis un endpoint Symfony)
+                eventSources: [
+                    {
+                        url: "{{ path('fc_load_events') }}", // URL pour charger les événements existants
+                        method: 'POST', // Utilisation de la méthode POST pour envoyer la requête
+                        extraParams: {
+                            filters: JSON.stringify({}) // Paramètres supplémentaires (ici vide)
+                        },
+                        failure: () => {
+                            // Fonction en cas d'échec du chargement des événements (actuellement désactivée)
+                            alert('Impossible de charger les événements! Merci de contacter le service technique.');
+                        },
+                    },
+                ],
+                // Configuration de la barre d’en-tête (toolbar)
+                headerToolbar: {
+                    left: 'prev,next today newEvent', // Boutons affichés à gauche de la barre (précédent, suivant, aujourd'hui, bouton personnalisé)
+                    center: 'title', // Affiche le titre du calendrier au centre
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay', // Boutons affichés à droite (vue mois, semaine, jour)
+                },
+                timeZone: 'Europe/Paris', // Définit le fuseau horaire (ici UTC)
+                // Personnalisation du texte des boutons de vue et "aujourd'hui"
+                buttonText: {
+                    today:    'Aujourd\'hui',
+                    month:    'Mois',
+                    week:     'Semaine',
+                    day:      'Jour',
+                    list:     'Liste'
+                },
+            });
+
+            // Affiche le calendrier à l'écran après configuration
+            calendar.render();
+        });
+    </script>
+{% endblock %}

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\StateController;
 use App\Entity\Contact;
 use DateTime;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -11,7 +12,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -36,15 +36,7 @@ class ContactCrudController extends AbstractCrudController
             AssociationField::new('state', 'État de la demande')
                 ->formatValue(function ($value, $entity) {
                     $state = $entity->getState();
-
-                    if($state->getId() === 1){
-                        $color = "info";
-                    }elseif ($state->getId() === 2){
-                        $color = "success";
-                    }else{
-                        $color = "danger";
-                    }
-
+                    $color = new StateController()->getBootstrapColorByState($state->getId());
 
                     return '<span class="badge badge-'.$color.'">' . $state->getName() . '</span>';
                 }),
@@ -157,9 +149,7 @@ class ContactCrudController extends AbstractCrudController
 
 
         return $actions
-            ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
-                return $action->setLabel('Nouvelle demande client'); // Remplacer le texte
-            })
+            ->disable(Action::NEW)
             ->add(Crud::PAGE_INDEX, $detailAction)
             ->add(Crud::PAGE_DETAIL, $reply)
             ->add(Crud::PAGE_EDIT, $reply)

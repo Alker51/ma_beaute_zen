@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Booking;
+use App\Entity\State;
 use App\Entity\User;
 use App\Form\BookingType;
 use App\Repository\BookingRepository;
@@ -11,12 +12,11 @@ use App\Repository\UserRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/booking')]
+#[Route('/booking', name: 'app_booking_')]
 final class BookingController extends AbstractController
 {
     private EmailController $emailService;
@@ -25,7 +25,7 @@ final class BookingController extends AbstractController
         $this->emailService = new EmailController();
     }
 
-    #[Route(name: 'app_booking_index', methods: ['GET'])]
+    #[Route(name: 'index', methods: ['GET'])]
     public function index(BookingRepository $bookingRepository): Response
     {
         return $this->render('booking/index.html.twig', [
@@ -33,18 +33,27 @@ final class BookingController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/calendar', name: 'app_booking_calendar')]
-    public function calendar(): Response
+    #[Route(path: '/calendar', name: 'calendar')]
+    public function calendar(BookingRepository $bookingRepository): Response
     {
-        return $this->render('booking/calendar.html.twig');
+        return $this->render('booking/calendar.html.twig', [
+            'bookings' => $bookingRepository->findAll(),
+        ]);
     }
 
-    #[Route('/new', name: 'app_booking_new', methods: ['GET', 'POST'])]
+    #[Route(path: '/calendarIframe', name: 'calendarIframe')]
+    public function calendarIframe(BookingRepository $bookingRepository): Response
+    {
+        return $this->render('booking/_calendar.html.twig', [
+                'bookings' => $bookingRepository->findAll(),
+            ]
+        );
+    }
+
+    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, StateRepository $stateRepository, UserRepository $userRepository): Response
     {
         $saisie = $request->getSession()->get('saisie_formulaire_rdv', []);
-
-        //$request->getSession()->remove('saisie_formulaire_rdv');
         $booking = new Booking();
 
         if(!empty($saisie)) {
@@ -83,8 +92,17 @@ final class BookingController extends AbstractController
             $entityManager->persist($booking);
             $entityManager->flush();
 
+            if($this->checkIfIframe($request))
+                return $this->redirectToRoute('app_booking_calendarIframe', [], Response::HTTP_SEE_OTHER);
+
             return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
         }
+
+        if($this->checkIfIframe($request))
+            return $this->render('booking/iframe/newIframe.html.twig', [
+                'booking' => $booking,
+                'form' => $form,
+            ]);
 
         return $this->render('booking/new.html.twig', [
             'booking' => $booking,
@@ -92,17 +110,33 @@ final class BookingController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_booking_show', methods: ['GET'])]
-    public function show(Booking $booking): Response
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    public function show(Booking $booking, Request $request): Response
     {
-        return $this->render('booking/show.html.twig', [
+        $view = 'booking/show.html.twig';
+
+        if($this->checkIfIframe($request))
+            $view = 'booking/iframe/showIframe.html.twig';
+
+        return $this->render($view, [
             'booking' => $booking,
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_booking_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Booking $booking, EntityManagerInterface $entityManager): Response
     {
+        $view = 'booking/edit.html.twig';
+
+        if($this->checkIfIframe($request))
+            $view = 'booking/iframe/editIframe.html.twig';
+
+        $isAdminEdit = false;
+        if($this->isGranted('ROLE_ADMIN')) {
+            $view = 'admin/booking/edit.html.twig';
+            $isAdminEdit = true;
+        }
+
         $originalEmploye = $booking->getWorker();
 
         $form = $this->createForm(BookingType::class, $booking, [
@@ -117,23 +151,26 @@ final class BookingController extends AbstractController
                 $booking->setWorker($originalEmploye);
             }
 
-            $bookingGood = $this->checkOverlap($booking->getWorker(), $booking->getStart(), $booking->getEnd(), $entityManager->getRepository(Booking::class), $entityManager->getRepository(User::class));
+            $bookingGood = $this->checkOverlap($booking->getWorker(), $booking->getStart(), $booking->getEnd(), $entityManager->getRepository(Booking::class), $entityManager->getRepository(User::class), $isAdminEdit);
 
             if(!$bookingGood) {
                 return $this->redirectToRoute('app_error', ['title' => 'Le rendez-vous est indisponible.', 'message' => 'Nous sommes désolé mais le rendez-vous que vous avez demandé n\'est pas disponible, merci de sélectionner un autre pratiquant ou bien un horaire différent.'], Response::HTTP_SEE_OTHER);
             }
 
             $entityManager->flush();
+
+            if($this->checkIfIframe($request))
+                return $this->redirectToRoute('app_booking_calendarIframe', [], Response::HTTP_SEE_OTHER);
             return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('booking/edit.html.twig', [
+        return $this->render($view, [
             'booking' => $booking,
             'form' => $form,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_booking_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, Booking $booking, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$booking->getId(), $request->getPayload()->getString('_token'))) {
@@ -141,11 +178,21 @@ final class BookingController extends AbstractController
             $entityManager->flush();
         }
 
+        $fromIframe = $request->request->get('from_iframe', '0'); // '1' ou '0'
+        $fromIframeBool = $fromIframe === '1';
+
+
+        if($fromIframeBool)
+            return $this->redirectToRoute('app_booking_calendarIframe', [], Response::HTTP_SEE_OTHER);
+
         return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    public function checkOverlap(User $worker, \DateTimeInterface $startRaw, \DateTimeInterface $endRaw, BookingRepository $bookingRepository, UserRepository $userRepository): bool
+    public function checkOverlap(User|null $worker, \DateTimeInterface $startRaw, \DateTimeInterface $endRaw, BookingRepository $bookingRepository, UserRepository $userRepository, bool $isAnEdit = false): bool
     {
+        if($isAnEdit || $worker === null)
+            return true;
+
         try {
             $start = DateTime::createFromInterface($startRaw);
             $end = DateTime::createFromInterface($endRaw);
@@ -166,4 +213,36 @@ final class BookingController extends AbstractController
         return true;
     }
 
+    private function checkIfIframe(Request $request) : bool
+    {
+        $fromIframe = $request->get('from_iframe', '0');
+        return $fromIframe === '1';
+    }
+
+    #[Route('/validate/{id}', name: 'validate', methods: ['GET'])]
+    public function validateBooking(Booking $booking, EntityManagerInterface $entityManager, StateRepository $stateRepository, Request $request) : Response
+    {
+        $stateBooking = $booking->getState();
+        $stateCanBeValidated = [1,5];
+
+        if(in_array($stateBooking->getId(), $stateCanBeValidated)) {
+
+            $booking->setState($stateRepository->findOneBy(['id' => StateController::VALIDATED_STATE]));
+
+            $entityManager->persist($booking);
+            $entityManager->flush();
+        } else {
+            $error = 'Impossible de valider le rendez-vous. L`état du rendez-vous n\'est pas valide. Un Rendez-vous "' . $stateBooking->getName().'" ne peux être validé.';
+
+            return $this->render('home/error.html.twig', [
+                'title' => 'Impossible de valider le rendez-vous.',
+                'message' => $error,
+            ]);
+        }
+
+        if($this->checkIfIframe($request))
+            return $this->redirectToRoute('app_booking_calendarIframe', [], Response::HTTP_SEE_OTHER);
+
+        return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
+    }
 }
