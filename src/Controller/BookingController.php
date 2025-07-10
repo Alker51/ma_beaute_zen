@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Booking;
+use App\Entity\Produit;
 use App\Entity\State;
 use App\Entity\User;
 use App\Form\BookingType;
 use App\Repository\BookingRepository;
+use App\Repository\ProduitRepository;
 use App\Repository\StateRepository;
 use App\Repository\UserRepository;
 use DateTime;
@@ -51,7 +53,7 @@ final class BookingController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, StateRepository $stateRepository, UserRepository $userRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, StateRepository $stateRepository, UserRepository $userRepository, ProduitRepository $produitRepository): Response
     {
         $saisie = $request->getSession()->get('saisie_formulaire_rdv', []);
         $booking = new Booking();
@@ -61,6 +63,9 @@ final class BookingController extends AbstractController
             $booking->setEnd(new \DateTime($saisie['booking']['end']));
             $booking->setWorker($userRepository->findOneBy(['id' => $saisie['booking']['worker']]));
             $booking->setTitle($saisie['booking']['title']);
+            $booking->setState($stateRepository->findOneBy(['id' => $saisie['booking']['state']]));
+            foreach ($saisie['booking']['products'] as $product)
+                $booking->addProduct($produitRepository->findOneBy(['id' => $product]));
 
             $form = $this->createForm(BookingType::class, $booking, [
                 'is_admin' => $this->isGranted('ROLE_ADMIN'),

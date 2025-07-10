@@ -40,7 +40,9 @@ class BookingType extends AbstractType
                 'choice_label' => 'name',
                 'required' => false,
                 'placeholder' => 'Aucun',
-                'input' => 'checkboxes',
+                'multiple' => true,
+                'expanded' => true,
+
             ])
         ;
         if ($isAdmin) {
