@@ -4,9 +4,11 @@ namespace App\Controller\Admin;
 
 use App\Entity\Produit;
 use App\Form\ImageType;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -16,6 +18,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class ProduitCrudController extends AbstractCrudController
 {
@@ -199,9 +202,23 @@ class ProduitCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        // Supprime le bouton "Modifier"
+        $switchOn = Action::new('switchOnlineProduct', 'Mettre en ligne','fa fa-toggle-on online_icon')
+            ->linkToCrudAction('switchOnlineOfflineProduct', function ($entity) {
+                return ['entityId' => $entity->getId()];
+            })
+            ->addCssClass('validate-btn')
+            ->displayIf(function (Produit $entity) {
+                return $entity->isActive() === false;
+            });
 
-
+        $switchOff = Action::new('switchOfflineProduct', 'Mettre hors ligne','fa fa-toggle-off offline_icon')
+            ->linkToCrudAction('switchOnlineOfflineProduct', function ($entity) {
+                return ['entityId' => $entity->getId()];
+            })
+            ->addCssClass('unvalidate-btn')
+            ->displayIf(function (Produit $entity) {
+                return $entity->isActive() === true;
+            });
         // Activer l'action "Détail"
         $detailAction = Action::new(Action::DETAIL)
             ->linkToCrudAction('detail');
@@ -212,6 +229,39 @@ class ProduitCrudController extends AbstractCrudController
                 return $action->setLabel('Nouveau produit'); // Remplacer le texte
             })
             ->add(Crud::PAGE_INDEX, $detailAction)
+            ->add(Crud::PAGE_INDEX, $switchOn)
+            ->add(Crud::PAGE_INDEX, $switchOff)
+            ->add(Crud::PAGE_DETAIL, $switchOn)
+            ->add(Crud::PAGE_DETAIL, $switchOff)
             ;
     }
+
+    public function switchOnlineOfflineProduct(AdminContext $context, EntityManagerInterface $entityManager): RedirectResponse
+    {
+        $entityId = $context->getRequest()->query->get('entityId');
+        if (!$entityId) {
+            $this->addFlash('danger', "Rendez-vous non trouvé !");
+            return $this->redirectToRoute('admin_booking_index');
+        }
+
+        $produit = $entityManager->getRepository(Produit::class)->find($entityId);
+
+        if (!$produit) {
+            throw $this->createNotFoundException('Produit non trouvé.');
+        }
+
+        // On inverse l'état (en ligne / hors ligne)
+        $produit->setActive(!$produit->isActive());
+
+        $entityManager->persist($produit);
+        $entityManager->flush();
+
+        if($produit->isActive())
+            $this->addFlash('success', 'Le produit a été mis en ligne.');
+        else
+            $this->addFlash('warning', 'Le produit n\'est plus en ligne.');
+
+        return $this->redirectToRoute('admin_produit_index');
+    }
+
 }

@@ -77,8 +77,8 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Image', 'fa fa-images', Image::class);
 
         yield MenuItem::section('Administration', 'fa fa-cogs');;
-        yield MenuItem::linkToRoute('Retour à l\'accueil', 'fa fa-door-open', 'app_home')->setCssClass('menu-item-home');
-        yield MenuItem::linkToLogout('Déconnexion', 'fa-solid fa-right-from-bracket')->setCssClass('menu-item-return');
+        yield MenuItem::linkToRoute('Retour à l\'accueil', 'fa fa-door-open menu-item-home', 'app_home')->setCssClass('menu-item-home');
+        yield MenuItem::linkToLogout('Déconnexion', 'fa-solid fa-right-from-bracket menu-item-return')->setCssClass('menu-item-return');
     }
 
     public function configureAssets(): Assets
