@@ -26,6 +26,16 @@
                 <th>Employé attribué au Rendez-vous</th>
                 <td>{{ booking.worker ? booking.worker.firstName ~ " " ~ booking.worker.lastName : "Aucun employé attribué pour le moment." }}</td>
             </tr>
+            <tr>
+                <th>Préstation{{ booking.products|length > 1 ? "s" : ""}} choisie{{ booking.products|length > 1 ? "s" : ""}}</th>
+                <td>
+                    {% for product in booking.products %}
+                        {{ product.name }}{% if not loop.last %}, {% endif %}
+                    {% else %}
+                        Aucune
+                    {% endfor %}
+                </td>
+            </tr>
         </tbody>
     </table>
 
