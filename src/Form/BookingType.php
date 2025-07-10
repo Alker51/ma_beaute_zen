@@ -23,7 +23,7 @@ class BookingType extends AbstractType
                 'widget' => 'single_text',
                 'html5' => true,
                 'with_seconds' => false, // facultatif : true pour activer les secondes
-                'input' => 'datetime-local',   // important pour bien accepter la date et l'heure
+                'input' => 'datetime',   // important pour bien accepter la date et l'heure
                 'label' => 'Début',
 
             ])
@@ -31,7 +31,7 @@ class BookingType extends AbstractType
                 'widget' => 'single_text',
                 'html5' => true,
                 'with_seconds' => false,
-                'input' => 'datetime-local',
+                'input' => 'datetime',
                 'label' => 'Fin',
 
             ])
