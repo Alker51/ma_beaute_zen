@@ -146,7 +146,7 @@ class Booking
         return $this->getProducts()->count();
     }
 
-    public function getDelayCount(): string
+    public function getDelayCount(): int
     {
         $sum = 0;
         foreach ($this->getProducts() as $product) {
@@ -154,7 +154,7 @@ class Booking
                 $sum += $product->getDelay();
             }
         }
-        return (string)$sum;
+        return $sum;
     }
 
 

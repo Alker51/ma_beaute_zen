@@ -64,7 +64,7 @@ class BookingCrudController extends AbstractCrudController
                     }
                     return '<span class="badge badge-primary">' . $count . ' prestation' . ($count > 1 ? "s" : "") .'</span>';
                 }),
-            TextField::new('delayCount', $labelDelay)
+            Field::new('delayCount', $labelDelay)
                 ->setDisabled(true)
                 ->formatValue(function ($value, $entity) {
                     if (method_exists($entity, 'getProducts')) {
