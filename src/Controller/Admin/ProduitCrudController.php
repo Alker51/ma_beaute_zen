@@ -34,7 +34,7 @@ class ProduitCrudController extends AbstractCrudController
         $fields = [
             FormField::addColumn(4,'Informations du produit'),
             FormField::addFieldset(''),
-            TextField::new('name', 'Nom'),
+            TextField::new('name', 'Désignation'),
             TextEditorField::new('Description')
                 ->hideOnIndex()
         ];
@@ -55,10 +55,15 @@ class ProduitCrudController extends AbstractCrudController
                 ->renderAsSwitch(false);
         }
 
+        $delayLabel = 'Durée de la préstation';
+
+        if($pageName == Crud::PAGE_EDIT)
+            $delayLabel .= ' (en minutes)';
+
         $fieldsAlt = [
-            NumberField::new('delay', 'Durée de la préstation (minutes)')
+            NumberField::new('delay', $delayLabel)
                 ->formatValue(function ($value, Produit $entity) {
-                    if(is_null($entity->getDelay()) || $entity->getDelay() == 0)
+                    if($entity->getDelay() == 0)
                         return 'Aucune durée indiquée.';
 
                     $delay = $entity->getDelay();
@@ -176,7 +181,7 @@ class ProduitCrudController extends AbstractCrudController
         $fieldsAlt = [
             FormField::addColumn(4,'Visuel du produit'),
             FormField::addFieldset(''),
-            CollectionField::new('images', 'Images associées')
+            CollectionField::new('images', 'Image(s)')
                 ->setEntryType(ImageType::class) // Utiliser un sous-formulaire pour chaque image
                 ->renderExpanded() // Ouvrir les sous-formulaires dans le formulaire principal
                 ->allowAdd() // Permettre d’ajouter des images
