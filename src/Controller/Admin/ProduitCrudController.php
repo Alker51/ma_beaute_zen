@@ -53,12 +53,24 @@ class ProduitCrudController extends AbstractCrudController
         }
 
         $fieldsAlt = [
-            NumberField::new('delay', 'Durée de la préstation')
+            NumberField::new('delay', 'Durée de la préstation (minutes)')
                 ->formatValue(function ($value, Produit $entity) {
                     if(is_null($entity->getDelay()) || $entity->getDelay() == 0)
                         return 'Aucune durée indiquée.';
-                    else
-                        return $entity->getDelay() . ' minutes.';
+
+                    $delay = $entity->getDelay();
+                    if ($delay >= 60) {
+                        $hours = floor($delay / 60);
+                        $minutes = $delay % 60;
+                        $result = $hours . ' heure' . ($hours > 1 ? 's' : '');
+
+                        if ($minutes > 0) {
+                            $result .= ' ' . $minutes . ' minute' . ($minutes > 1 ? 's' : '');
+                        }
+
+                        return $result . '.';
+                    }
+                    return $delay . ' minute' . ($delay > 1 ? 's' : '') . '.';
                 }),
 
             FormField::addColumn(4,'Prix, Stock et Promotion'),
