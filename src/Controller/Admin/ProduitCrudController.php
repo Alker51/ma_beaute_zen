@@ -55,7 +55,7 @@ class ProduitCrudController extends AbstractCrudController
                 ->renderAsSwitch(false);
         }
 
-        $delayLabel = 'Durée de la préstation';
+        $delayLabel = 'Durée de la prestation';
 
         if($pageName == Crud::PAGE_EDIT)
             $delayLabel .= ' (en minutes)';

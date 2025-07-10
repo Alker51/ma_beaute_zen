@@ -141,6 +141,12 @@ class Booking
         return $this;
     }
 
+    public function getProductsCount(): int
+    {
+        return $this->getProducts()->count();
+    }
+
+
     public function removeProduct(Produit $product): static
     {
         $this->products->removeElement($product);

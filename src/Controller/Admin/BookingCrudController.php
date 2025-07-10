@@ -12,7 +12,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,6 +40,23 @@ class BookingCrudController extends AbstractCrudController
             TextField::new('title'),
             DateTimeField::new('start', 'Début RDV'),
             DateTimeField::new('end', 'Fin RDV'),
+            AssociationField::new('products', 'Prestations choisies')
+                ->setFormTypeOption('multiple', true)
+                ->setFormTypeOption('by_reference', false)
+                ->onlyOnForms(),
+            Field::new('productsCount', 'Prestations choisies')
+                ->onlyOnIndex()
+                ->formatValue(function ($value, $entity) {
+                    $count = 0;
+                    if (method_exists($entity, 'getProducts')) {
+                        $count = $entity->getProducts()->count();
+                    }
+                    if ($count === 0) {
+                        return '<span class="badge badge-danger">Aucune prestation</span>';
+                    }
+                    return '<span class="badge badge-primary">' . $count . ' prestation' . ($count > 1 ? "s" : "") .'</span>';
+                }),
+
             AssociationField::new('state')
                 ->formatValue(function ($value, $entity) {
                 $state = $entity->getState();
