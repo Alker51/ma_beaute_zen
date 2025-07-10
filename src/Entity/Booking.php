@@ -146,6 +146,18 @@ class Booking
         return $this->getProducts()->count();
     }
 
+    public function getDelayCount(): string
+    {
+        $sum = 0;
+        foreach ($this->getProducts() as $product) {
+            if (method_exists($product, 'getDelay')) {
+                $sum += $product->getDelay();
+            }
+        }
+        return (string)$sum;
+    }
+
+
 
     public function removeProduct(Produit $product): static
     {

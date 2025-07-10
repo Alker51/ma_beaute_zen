@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Controller\StateController;
 use App\Entity\Booking;
+use App\Entity\Produit;
 use App\Repository\StateRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -36,6 +37,13 @@ class BookingCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        $labelDelay = 'Durée estimée des prestations';
+
+        if($pageName == Crud::PAGE_EDIT)
+            $labelDelay .= ' (en minutes)';
+
+        $labelDelay .= '.';
+
         return [
             TextField::new('title'),
             DateTimeField::new('start', 'Début RDV'),
@@ -55,6 +63,25 @@ class BookingCrudController extends AbstractCrudController
                         return '<span class="badge badge-danger">Aucune prestation</span>';
                     }
                     return '<span class="badge badge-primary">' . $count . ' prestation' . ($count > 1 ? "s" : "") .'</span>';
+                }),
+            TextField::new('delayCount', $labelDelay)
+                ->setDisabled(true)
+                ->formatValue(function ($value, $entity) {
+                    if (method_exists($entity, 'getProducts')) {
+                        $products = $entity->getProducts();
+                    }
+
+                    if(is_null($products) || $products->count() == 0)
+                        return 'Aucun délai.';
+
+                    $time = 0;
+
+                    foreach ($products as $product) {
+                        $time = $time + $product->getDelay();
+                    }
+
+                    $textTime = Produit::timeToStringTime($time);
+                    return $textTime;
                 }),
 
             AssociationField::new('state')
