@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Booking;
+use App\Entity\Produit;
 use App\Entity\State;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -22,7 +23,7 @@ class BookingType extends AbstractType
                 'widget' => 'single_text',
                 'html5' => true,
                 'with_seconds' => false, // facultatif : true pour activer les secondes
-                'input' => 'datetime',   // important pour bien accepter la date et l'heure
+                'input' => 'datetime-local',   // important pour bien accepter la date et l'heure
                 'label' => 'Début',
 
             ])
@@ -30,9 +31,16 @@ class BookingType extends AbstractType
                 'widget' => 'single_text',
                 'html5' => true,
                 'with_seconds' => false,
-                'input' => 'datetime',
+                'input' => 'datetime-local',
                 'label' => 'Fin',
 
+            ])
+            ->add('products', EntityType::class, [
+                'class' => Produit::class,
+                'choice_label' => 'name',
+                'required' => false,
+                'placeholder' => 'Aucun',
+                'input' => 'checkboxes',
             ])
         ;
         if ($isAdmin) {

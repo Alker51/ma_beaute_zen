@@ -51,9 +51,16 @@ class Produit
     #[ORM\Column(nullable: true)]
     private ?bool $noStockProduct = null;
 
+    /**
+     * @var Collection<int, Booking>
+     */
+    #[ORM\ManyToMany(targetEntity: Booking::class, mappedBy: 'products')]
+    private Collection $bookings;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
+        $this->bookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -220,6 +227,33 @@ class Produit
     public function setNoStockProduct(bool $noStockProduct): static
     {
         $this->noStockProduct = $noStockProduct;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Booking>
+     */
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
+    }
+
+    public function addBooking(Booking $booking): static
+    {
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings->add($booking);
+            $booking->addProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBooking(Booking $booking): static
+    {
+        if ($this->bookings->removeElement($booking)) {
+            $booking->removeProduct($this);
+        }
 
         return $this;
     }
