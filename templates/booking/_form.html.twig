@@ -53,7 +53,7 @@
         time_24hr: true,
     });
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('turbo:load', function () {
         flatpickr("#booking_start", {
             enableTime: true,
             locale: "fr",
@@ -64,7 +64,7 @@
         });
     });
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('turbo:load', function () {
         function updateTotalDelay() {
             let total = 0;
             // Attention au nom de ton champ, adapte si besoin
@@ -117,7 +117,7 @@
     }
 
     // Sur changement de la date de début et des produits :
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('turbo:load', function () {
         document.querySelectorAll('#booking_start,input[name^="booking[products]"]').forEach(el => {
             el.addEventListener('change', calcEstimatedEnd);
         });
