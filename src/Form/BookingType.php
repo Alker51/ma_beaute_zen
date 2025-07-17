@@ -27,14 +27,6 @@ class BookingType extends AbstractType
                 'label' => 'Début',
 
             ])
-            ->add('end', null, [
-                'widget' => 'single_text',
-                'html5' => true,
-                'with_seconds' => false,
-                'input' => 'datetime',
-                'label' => 'Fin',
-
-            ])
             ->add('products', EntityType::class, [
                 'class' => Produit::class,
                 'choice_label' => 'name',
