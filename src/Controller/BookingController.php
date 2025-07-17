@@ -163,16 +163,15 @@ final class BookingController extends AbstractController
     {
         $allProducts = $entityManager->getRepository(Produit::class)->findAll();
         $view = 'booking/edit.html.twig';
+        $originalEmploye = $booking->getWorker();
+        $isAdminEdit = false;
 
         if($this->checkIfIframe($request))
             $view = 'booking/iframe/editIframe.html.twig';
 
-        $isAdminEdit = false;
         if($this->isGranted('ROLE_ADMIN')) {
             $isAdminEdit = true;
         }
-
-        $originalEmploye = $booking->getWorker();
 
         $form = $this->createForm(BookingType::class, $booking, [
                 'is_admin' => $this->isGranted('ROLE_ADMIN'),
@@ -186,7 +185,7 @@ final class BookingController extends AbstractController
                 $booking->setWorker($originalEmploye);
             }
 
-            $booking = $this->EndHoursCalc($booking);
+                $booking = $this->EndHoursCalc($booking);
 
             $bookingGood = $this->checkOverlap($booking->getWorker(), $booking->getStart(), $booking->getEnd(), $entityManager->getRepository(Booking::class), $entityManager->getRepository(User::class), $isAdminEdit);
 
