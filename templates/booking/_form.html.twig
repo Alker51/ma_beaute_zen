@@ -14,6 +14,7 @@
 {{ form_end(form) }}
 
 <script>
+    {# Warning BUG : Voir pourquoi mais le JS n'est pas chargé lors du premier chargement de la page. Je doit faire un F5 pour appliquer le JS #}
     window.productDelays = {
         {% for produit in all_products %}
         "{{ produit.id }}": {{ produit.delay ?: 0 }}{% if not loop.last %},{% endif %}
