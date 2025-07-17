@@ -1,7 +1,6 @@
 {{ form_start(form) }}
     {{ form_row(form.title, { label: 'Titre du rendez-vous' }) }}
     {{ form_row(form.start, { label: 'Date & Heure de début' }) }}
-    {{ form_row(form.end, { label: 'Date & Heure de fin' }) }}
     {{ form_row(form._token) }}
     {{ form_row(form.products, { label: 'Prestation voulue(s) lors du rendez-vous' }) }}
     {% if is_granted("ROLE_ADMIN") %}
@@ -11,7 +10,6 @@
     <div>
         Durée totale estimée : <span id="total-delay">0</span>
     </div>
-
 <button class="btn btn-success" type="submit">Réserver</button>
 {{ form_end(form) }}
 
