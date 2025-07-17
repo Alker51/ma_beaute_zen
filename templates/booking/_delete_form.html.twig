@@ -1,5 +1,5 @@
 <form method="post" action="{{ path('app_booking_delete', {'id': booking.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ booking.id) }}">
-    <input type="hidden" name="from_iframe" value="{{ fromIframe ? 1 : 0 }}">
+    <input type="hidden" name="from_iframe" value="{{ fromIframe|default(0) ? 1 : 0 }}">
     <button class="btn btn-danger">Supprimer le rendez-vous</button>
 </form>
