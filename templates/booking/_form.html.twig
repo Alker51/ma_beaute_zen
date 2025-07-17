@@ -18,42 +18,17 @@
 {{ form_end(form) }}
 
 <script>
-    {# Warning BUG : Voir pourquoi mais le JS n'est pas chargé lors du premier chargement de la page. Je doit faire un F5 pour appliquer le JS #}
-    window.productDelays = {
-        {% for produit in all_products %}
-        "{{ produit.id }}": {{ produit.delay ?: 0 }}{% if not loop.last %},{% endif %}
-        {% endfor %}
-    };
-
-    function formatDuration(minutes) {
-        const h = Math.floor(minutes / 60);
-        const m = minutes % 60;
-        let txt = '';
-        if (h > 0) {
-            txt += h + ' heure' + (h > 1 ? 's' : '');
-        }
-        if (h > 0 && m > 0) {
-            txt += ' ';
-        }
-        if (m > 0) {
-            txt += m + ' minute' + (m > 1 ? 's' : '');
-        }
-        if (txt === '') {
-            txt = '0 minute';
-        }
-        return txt;
-    }
-
-    flatpickr("input[type=datetime-local]", {
-        enableTime: true,
-        locale: "fr",
-        dateFormat: "Y-m-d\\TH:i",
-        altFormat: "\\L\\e d F Y \\à H:i",
-        altInput: true,
-        time_24hr: true,
-    });
-
+    {# Warning BUG : Fonctionne avec NEW mais pas EDIT. #}
     document.addEventListener('turbo:load', function () {
+        flatpickr("input[type=datetime-local]", {
+            enableTime: true,
+            locale: "fr",
+            dateFormat: "Y-m-d\\TH:i",
+            altFormat: "\\L\\e d F Y \\à H:i",
+            altInput: true,
+            time_24hr: true,
+        });
+
         flatpickr("#booking_start", {
             enableTime: true,
             locale: "fr",
@@ -65,6 +40,31 @@
     });
 
     document.addEventListener('turbo:load', function () {
+        window.productDelays = {
+            {% for produit in all_products %}
+            "{{ produit.id }}": {{ produit.delay ?: 0 }}{% if not loop.last %},{% endif %}
+            {% endfor %}
+        };
+
+        function formatDuration(minutes) {
+            const h = Math.floor(minutes / 60);
+            const m = minutes % 60;
+            let txt = '';
+            if (h > 0) {
+                txt += h + ' heure' + (h > 1 ? 's' : '');
+            }
+            if (h > 0 && m > 0) {
+                txt += ' ';
+            }
+            if (m > 0) {
+                txt += m + ' minute' + (m > 1 ? 's' : '');
+            }
+            if (txt === '') {
+                txt = '0 minute';
+            }
+            return txt;
+        }
+
         function updateTotalDelay() {
             let total = 0;
             // Attention au nom de ton champ, adapte si besoin
