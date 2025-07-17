@@ -3,12 +3,44 @@
     {{ form_row(form.start, { label: 'Date & Heure de début' }) }}
     {{ form_row(form.end, { label: 'Date & Heure de fin' }) }}
     {{ form_row(form._token) }}
-    {{ form_row(form.worker, { label: 'Employé assigné à ce rendez-vous' }) }}
-    {{ form_row(form.state) }}
-<button class="btn btn-success" type="submit">Confirmer</button>
+    {{ form_row(form.products, { label: 'Prestation voulue(s) lors du rendez-vous' }) }}
+    {% if is_granted("ROLE_ADMIN") %}
+        {{ form_row(form.worker, { label: 'Employé assigné à ce rendez-vous' }) }}
+        {{ form_row(form.state, { label: 'Statut du Rendez-vous' }) }}
+    {% endif %}
+    <div>
+        Durée totale estimée : <span id="total-delay">0</span>
+    </div>
+
+<button class="btn btn-success" type="submit">Réserver</button>
 {{ form_end(form) }}
 
 <script>
+    window.productDelays = {
+        {% for produit in all_products %}
+        "{{ produit.id }}": {{ produit.delay ?: 0 }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    };
+
+    function formatDuration(minutes) {
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        let txt = '';
+        if (h > 0) {
+            txt += h + ' heure' + (h > 1 ? 's' : '');
+        }
+        if (h > 0 && m > 0) {
+            txt += ' ';
+        }
+        if (m > 0) {
+            txt += m + ' minute' + (m > 1 ? 's' : '');
+        }
+        if (txt === '') {
+            txt = '0 minute';
+        }
+        return txt;
+    }
+
     const now = new Date();
 
     let dateforFlatprickrStart = now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
@@ -43,5 +75,25 @@
             defaultDate: dateforFlatprickrEnd,
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        function updateTotalDelay() {
+            let total = 0;
+            // Attention au nom de ton champ, adapte si besoin
+            document.querySelectorAll('input[name^="booking[products]"]:checked').forEach(cb => {
+                let delay = window.productDelays[cb.value] || 0;
+                total += delay;
+            });
+            document.getElementById('total-delay').textContent = formatDuration(total);
+        }
+
+        document.querySelectorAll('input[name^="booking[products]"]').forEach(cb => {
+            cb.addEventListener('change', updateTotalDelay);
+        });
+
+        // Initialiser à l'ouverture
+        updateTotalDelay();
+    });
+
 
 </script>

@@ -109,9 +109,12 @@ final class BookingController extends AbstractController
                 'form' => $form,
             ]);
 
+        $allProducts = $entityManager->getRepository(Produit::class)->findAll();
+
         return $this->render('booking/new.html.twig', [
             'booking' => $booking,
             'form' => $form,
+            'all_products' => $allProducts,
         ]);
     }
 
