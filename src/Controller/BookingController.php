@@ -55,6 +55,7 @@ final class BookingController extends AbstractController
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, StateRepository $stateRepository, UserRepository $userRepository, ProduitRepository $produitRepository): Response
     {
+        $allProducts = $entityManager->getRepository(Produit::class)->findAll();
         $saisie = $request->getSession()->get('saisie_formulaire_rdv', []);
         $booking = new Booking();
 
@@ -84,16 +85,9 @@ final class BookingController extends AbstractController
             $booking->setState($stateRepository->findOneBy(['id' => StateController::PENDING_VALIDATION_STATE]));
             $booking->setCustomer($user);
 
+            $booking = $this->EndHoursCalc($booking);
+
             $bookingGood = $this->checkOverlap($booking->getWorker(), $booking->getStart(), $booking->getEnd(), $entityManager->getRepository(Booking::class), $entityManager->getRepository(User::class));
-
-            $products = $booking->getProducts();
-            $delay = 0;
-            foreach($products as $product) {
-                $delay += $product->getDelay();
-            }
-
-            $end = (clone $booking->getStart())->modify("+{$delay} minutes");
-            $booking->setEnd($end);
 
             if(!$bookingGood) {
                 $session = $request->getSession();
@@ -115,9 +109,8 @@ final class BookingController extends AbstractController
             return $this->render('booking/iframe/newIframe.html.twig', [
                 'booking' => $booking,
                 'form' => $form,
+                'all_products' => $produitRepository->findAll(),
             ]);
-
-        $allProducts = $entityManager->getRepository(Produit::class)->findAll();
 
         return $this->render('booking/new.html.twig', [
             'booking' => $booking,
@@ -139,9 +132,36 @@ final class BookingController extends AbstractController
         ]);
     }
 
+
+    public function EndHoursCalc($booking): Booking
+    {
+        $products = $booking->getProducts();
+        $delay = 0;
+        foreach($products as $product) {
+            $delay += $product->getDelay();
+        }
+
+        $end = (clone $booking->getStart())->modify("+{$delay} minutes");
+        $nbMinRound = 10;
+        // Arrondi au quart d’heure supérieur :
+        $minute = (int) $end->format('i');
+        $modulo = $minute % $nbMinRound;
+        if ($modulo > 0) {
+            // Ajoute le complément pour atteindre le prochain quart d'heure
+            $end->modify('+' . ($nbMinRound - $modulo) . ' minutes');
+            // Mets les secondes à zéro
+            $end->setTime((int)$end->format('H'), (int)$end->format('i'), 0);
+        }
+
+        $booking->setEnd($end);
+
+        return $booking;
+    }
+
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Booking $booking, EntityManagerInterface $entityManager): Response
     {
+        $allProducts = $entityManager->getRepository(Produit::class)->findAll();
         $view = 'booking/edit.html.twig';
 
         if($this->checkIfIframe($request))
@@ -149,7 +169,6 @@ final class BookingController extends AbstractController
 
         $isAdminEdit = false;
         if($this->isGranted('ROLE_ADMIN')) {
-            $view = 'admin/booking/edit.html.twig';
             $isAdminEdit = true;
         }
 
@@ -167,6 +186,8 @@ final class BookingController extends AbstractController
                 $booking->setWorker($originalEmploye);
             }
 
+            $booking = $this->EndHoursCalc($booking);
+
             $bookingGood = $this->checkOverlap($booking->getWorker(), $booking->getStart(), $booking->getEnd(), $entityManager->getRepository(Booking::class), $entityManager->getRepository(User::class), $isAdminEdit);
 
             if(!$bookingGood) {
@@ -183,6 +204,7 @@ final class BookingController extends AbstractController
         return $this->render($view, [
             'booking' => $booking,
             'form' => $form,
+            'all_products' => $allProducts,
         ]);
     }
 
