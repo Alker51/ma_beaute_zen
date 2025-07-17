@@ -48,6 +48,7 @@ class UserType extends AbstractType
             ->add('birth_date', DateType::class, [
                 'label' => 'Date de naissance',
                 'widget' => 'choice',
+                'years' => range(date('Y') - 100, date('Y')),
             ])
             ->add('adress', TextType::class, [
                 'label' => 'Adresse',
@@ -66,7 +67,7 @@ class UserType extends AbstractType
             ->add('phone', NumberType::class, [
                 'label' => 'Numéro de téléphone',
             ])
-            ->add('wants_newsletter', CheckboxType::class, [
+            ->add('want_newsletter', CheckboxType::class, [
                 'label' => 'Je souhaite recevoir la newsletter ?',
             ])
         ;
