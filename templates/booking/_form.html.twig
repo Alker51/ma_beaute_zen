@@ -10,6 +10,10 @@
     <div>
         Durée totale estimée : <span id="total-delay">0</span>
     </div>
+    <div>
+        <strong>Heure estimée de fin :</strong> <span id="estimated-end">--:--</span>
+    </div>
+
 <button class="btn btn-success" type="submit">Réserver</button>
 {{ form_end(form) }}
 
@@ -40,11 +44,6 @@
         return txt;
     }
 
-    const now = new Date();
-
-    let dateforFlatprickrStart = now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
-    let dateforFlatprickrEnd = now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate() + " " + (now.getHours()+1) + ":" + now.getMinutes();
-
     flatpickr("input[type=datetime-local]", {
         enableTime: true,
         locale: "fr",
@@ -62,16 +61,6 @@
             altFormat: "\\L\\e d F Y \\à H:i",
             altInput: true,
             time_24hr: true,
-            defaultDate: dateforFlatprickrStart,
-        });
-        flatpickr("#booking_end", {
-            enableTime: true,
-            locale: "fr",
-            dateFormat: "Y-m-d\\TH:i",
-            altFormat: "\\L\\e d F Y \\à H:i",
-            altInput: true,
-            time_24hr: true,
-            defaultDate: dateforFlatprickrEnd,
         });
     });
 
@@ -94,5 +83,47 @@
         updateTotalDelay();
     });
 
+    function pad(num) {
+        return num.toString().padStart(2, '0');
+    }
+
+    function calcEstimatedEnd() {
+        // Récupère le champ date/heure de début
+        let startInput = document.querySelector('#booking_start');
+        if (!startInput) return;
+        let startDateStr = startInput.value;
+        if (!startDateStr) {
+            document.getElementById('estimated-end').textContent = '--:--';
+            return;
+        }
+        let startDate = new Date(startDateStr);
+        if (isNaN(startDate)) {
+            document.getElementById('estimated-end').textContent = '--:--';
+            return;
+        }
+
+        // Récupère la durée totale
+        let total = 0;
+        document.querySelectorAll('input[name^="booking[products]"]:checked').forEach(cb => {
+            let delay = window.productDelays[cb.value] || 0;
+            total += delay;
+        });
+
+        let endDate = new Date(startDate.getTime() + total * 60000);
+
+        let hour = pad(endDate.getHours());
+        let minutes = pad(endDate.getMinutes());
+        document.getElementById('estimated-end').textContent = hour + ':' + minutes;
+    }
+
+    // Sur changement de la date de début et des produits :
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('#booking_start,input[name^="booking[products]"]').forEach(el => {
+            el.addEventListener('change', calcEstimatedEnd);
+        });
+
+        // Initialiser au chargement
+        calcEstimatedEnd();
+    });
 
 </script>
