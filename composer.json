@@ -97,7 +97,8 @@
         ],
         "start": [
             "Composer\\Config::disableProcessTimeout",
-            "symfony server:start --no-tls"
+            "symfony server:start --no-tls &",
+            "maildev"
         ],
         "stop": [
             "symfony server:stop"
