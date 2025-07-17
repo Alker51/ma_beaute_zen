@@ -60,7 +60,6 @@ final class BookingController extends AbstractController
 
         if(!empty($saisie)) {
             $booking->setStart(new \DateTime($saisie['booking']['start']));
-            $booking->setEnd(new \DateTime($saisie['booking']['end']));
             $booking->setWorker($userRepository->findOneBy(['id' => $saisie['booking']['worker']]));
             $booking->setTitle($saisie['booking']['title']);
             $booking->setState($stateRepository->findOneBy(['id' => $saisie['booking']['state']]));
@@ -86,6 +85,15 @@ final class BookingController extends AbstractController
             $booking->setCustomer($user);
 
             $bookingGood = $this->checkOverlap($booking->getWorker(), $booking->getStart(), $booking->getEnd(), $entityManager->getRepository(Booking::class), $entityManager->getRepository(User::class));
+
+            $products = $booking->getProducts();
+            $delay = 0;
+            foreach($products as $product) {
+                $delay += $product->getDelay();
+            }
+
+            $end = (clone $booking->getStart())->modify("+{$delay} minutes");
+            $booking->setEnd($end);
 
             if(!$bookingGood) {
                 $session = $request->getSession();
