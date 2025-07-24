@@ -58,17 +58,14 @@ final class BookingController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager, StateRepository $stateRepository, UserRepository $userRepository, ProduitRepository $produitRepository): Response
     {
         $booking = new Booking();
-        //$saisie = $request->getSession()->get('saisie_formulaire_rdv', []);
+        $saisie = $request->getSession()->get('saisie_formulaire_rdv', []);
         $step = $request->query->getInt('step', 1);
 
-        /*if(!empty($saisie)) {
+        if(!empty($saisie)) {
             $booking->setStart(new \DateTime($saisie['booking']['start']));
-            $booking->setWorker($userRepository->findOneBy(['id' => $saisie['booking']['worker']]));
-            $booking->setTitle($saisie['booking']['title']);
-            $booking->setState($stateRepository->findOneBy(['id' => $saisie['booking']['state']]));
             foreach ($saisie['booking']['products'] as $product)
                 $booking->addProduct($produitRepository->findOneBy(['id' => $product]));
-        }*/
+        }
 
         if ($step == 1) {
             $form = $this->createForm(BookingStep1Type::class, $booking, [
@@ -78,6 +75,23 @@ final class BookingController extends AbstractController
             if ($form->isSubmitted() && $form->isValid()) {
                 $data = $form->getData();
                 $request->getSession()->set('booking_step1', $data);
+
+                $delay = 0;
+                foreach ($data->getProducts() as $product) {
+                    $delay += $product->getDelay();
+                }
+
+                $end = (clone $data->getStart())->modify("+{$delay} minutes");
+                $data->setEnd($end);
+
+                $bookingGood = $this->checkOverlap($data->getWorker(), $data->getStart(), $data->getEnd(), $entityManager->getRepository(Booking::class), $entityManager->getRepository(User::class));
+
+                if(!$bookingGood) {
+                    $session = $request->getSession();
+                    $session->set('saisie_formulaire_rdv', $request->request->all());
+
+                    return $this->redirectToRoute('app_error', ['title' => 'Le rendez-vous est indisponible.', 'message' => 'Nous sommes désolé mais le rendez-vous que vous avez demandé n\'est pas disponible, merci de sélectionner un autre pratiquant ou bien un horaire différent.'], Response::HTTP_SEE_OTHER);
+                }
 
                 // Rediriger vers l'étape 2
                 return $this->redirectToRoute('app_booking_new', ['step' => 2]);
@@ -127,7 +141,7 @@ final class BookingController extends AbstractController
                 foreach ($step1->getProducts() as $produit) {
                     $booking->addProduct($produitRepository->findOneBy(['id' => $produit]));
                 }
-
+                $booking->setEnd($step1->getEnd());
                 $customer = [
                     'lastName' => $step2['customerLastName'],
                     'firstName' => $step2['customerFirstName'],
@@ -185,14 +199,6 @@ final class BookingController extends AbstractController
                     $booking->setState($stateRepository->findOneBy(['id' => $step2['state']]));
                 else
                     $booking->setState($stateRepository->findOneBy(['id' => StateController::PENDING_STATE]));
-
-                $delay = 0;
-                foreach ($booking->getProducts() as $product) {
-                    $delay += $product->getDelay();
-                }
-
-                $end = (clone $booking->getStart())->modify("+{$delay} minutes");
-                $booking->setEnd($end);
 
                 $entityManager->persist($booking);
                 $entityManager->flush();
