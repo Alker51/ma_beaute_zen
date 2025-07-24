@@ -91,12 +91,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $visitor = null;
 
-    public function __construct()
-    {
+    public function __construct(
+        string  $email = '',
+        array   $roles = [],
+        string  $password = '',
+        string  $firstName = '',
+        string  $lastName = '',
+        string  $adress = '',
+        string  $zipcode = '',
+        string  $city = '',
+        ?Gender $gender = null,
+        string  $phone = '',
+        bool    $wantNewsletter = false,
+        bool    $visitor = false
+    ) {
         $this->contacts = new ArrayCollection();
         $this->replies = new ArrayCollection();
         $this->bookings = new ArrayCollection();
         $this->bookingsToComplete = new ArrayCollection();
+
+        $this->email = $email;
+        $this->roles = $roles;
+        $this->password = $password;
+        $this->first_name = $firstName;
+        $this->last_name = $lastName;
+        $this->adress = $adress;
+        $this->zipcode = $zipcode;
+        $this->city = $city;
+        $this->gender = $gender;
+        $this->phone = $phone;
+        $this->want_newsletter = $wantNewsletter;
+        $this->visitor = $visitor;
     }
 
     public function getId(): ?int
