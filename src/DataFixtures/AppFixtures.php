@@ -30,6 +30,10 @@ class AppFixtures extends Fixture
         $manager->persist($admin);
         $manager->flush();
 
+        $user = $this->generateUser($genderEntities);
+        $manager->persist($user);
+        $manager->flush();
+
         $taxEntities = $this->generateTaxes($manager);
         $manager->flush();
 
@@ -114,7 +118,8 @@ class AppFixtures extends Fixture
             ->setGender($genderEntities['Homme']) // Genre associé
             ->setWantNewsletter(true)
             // Définir le rôle d'admin
-            ->setRoles(['ROLE_ADMIN']);
+            ->setRoles(['ROLE_ADMIN'])
+            ->setVisitor(false);
 
         // Hachage et définition du mot de passe
         $hashedPassword = $this->passwordHasher->hashPassword($admin, 'admin123');
@@ -139,5 +144,29 @@ class AppFixtures extends Fixture
             $statement->setName($state);
             $manager->persist($statement);
         }
+    }
+
+    private function generateUser(array $genderEntities)
+    {
+        $user = new User()
+            ->setEmail('test@example.com') // Email de l'administrateur
+            ->setFirstName('Rémy')
+            ->setLastName('Robin')
+            ->setPhone('0123456789')
+            ->setAdress('123 Rue des test')
+            ->setCity('TestCity')
+            ->setZipcode('12345')
+            ->setBirthDate(new \DateTime('1998-02-06')) // Date de naissance
+            ->setGender($genderEntities['Homme']) // Genre associé
+            ->setWantNewsletter(true)
+            // Définir le rôle d'admin
+            ->setRoles(['ROLE_USER'])
+            ->setVisitor(false);
+
+        // Hachage et définition du mot de passe
+        $hashedPassword = $this->passwordHasher->hashPassword($user, 'test');
+        $user->setPassword($hashedPassword);
+
+        return $user;
     }
 }
