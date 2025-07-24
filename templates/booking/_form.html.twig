@@ -7,18 +7,10 @@
         {{ form_row(form.worker, { label: 'Employé assigné à ce rendez-vous' }) }}
         {{ form_row(form.state, { label: 'Statut du Rendez-vous' }) }}
     {% endif %}
-    <div>
-        Durée totale estimée : <span id="total-delay">0</span>
-    </div>
-    <div>
-        <strong>Heure estimée de fin :</strong> <span id="estimated-end">--:--</span>
-    </div>
-
 <button class="btn btn-success" type="submit">Réserver</button>
 {{ form_end(form) }}
 
 <script>
-    {# Warning BUG : Fonctionne avec NEW mais pas EDIT. #}
     document.addEventListener('turbo:load', function () {
         flatpickr("input[type=datetime-local]", {
             enableTime: true,
@@ -38,92 +30,4 @@
             time_24hr: true,
         });
     });
-
-    document.addEventListener('turbo:load', function () {
-        window.productDelays = {
-            {% for produit in all_products %}
-            "{{ produit.id }}": {{ produit.delay ?: 0 }}{% if not loop.last %},{% endif %}
-            {% endfor %}
-        };
-
-        function formatDuration(minutes) {
-            const h = Math.floor(minutes / 60);
-            const m = minutes % 60;
-            let txt = '';
-            if (h > 0) {
-                txt += h + ' heure' + (h > 1 ? 's' : '');
-            }
-            if (h > 0 && m > 0) {
-                txt += ' ';
-            }
-            if (m > 0) {
-                txt += m + ' minute' + (m > 1 ? 's' : '');
-            }
-            if (txt === '') {
-                txt = '0 minute';
-            }
-            return txt;
-        }
-
-        function updateTotalDelay() {
-            let total = 0;
-            // Attention au nom de ton champ, adapte si besoin
-            document.querySelectorAll('input[name^="booking[products]"]:checked').forEach(cb => {
-                let delay = window.productDelays[cb.value] || 0;
-                total += delay;
-            });
-            document.getElementById('total-delay').textContent = formatDuration(total);
-        }
-
-        document.querySelectorAll('input[name^="booking[products]"]').forEach(cb => {
-            cb.addEventListener('change', updateTotalDelay);
-        });
-
-        // Initialiser à l'ouverture
-        updateTotalDelay();
-    });
-
-    function pad(num) {
-        return num.toString().padStart(2, '0');
-    }
-
-    function calcEstimatedEnd() {
-        // Récupère le champ date/heure de début
-        let startInput = document.querySelector('#booking_start');
-        if (!startInput) return;
-        let startDateStr = startInput.value;
-        if (!startDateStr) {
-            document.getElementById('estimated-end').textContent = '--:--';
-            return;
-        }
-        let startDate = new Date(startDateStr);
-        if (isNaN(startDate)) {
-            document.getElementById('estimated-end').textContent = '--:--';
-            return;
-        }
-
-        // Récupère la durée totale
-        let total = 0;
-        document.querySelectorAll('input[name^="booking[products]"]:checked').forEach(cb => {
-            let delay = window.productDelays[cb.value] || 0;
-            total += delay;
-        });
-
-        let endDate = new Date(startDate.getTime() + total * 60000);
-
-        let hour = pad(endDate.getHours());
-        let minutes = pad(endDate.getMinutes());
-        document.getElementById('estimated-end').textContent = hour + ':' + minutes;
-    }
-
-    // Sur changement de la date de début et des produits :
-    document.addEventListener('turbo:load', function () {
-        document.querySelectorAll('#booking_start,input[name^="booking[products]"]').forEach(el => {
-            el.addEventListener('change', calcEstimatedEnd);
-        });
-
-        // Initialiser au chargement
-        calcEstimatedEnd();
-    });
-
 </script>

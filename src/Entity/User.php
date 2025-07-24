@@ -88,6 +88,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'worker')]
     private Collection $bookingsToComplete;
 
+    #[ORM\Column]
+    private ?bool $visitor = null;
+
     public function __construct()
     {
         $this->contacts = new ArrayCollection();
@@ -407,5 +410,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __toString() :string
     {
         return $this->getFullName();
+    }
+
+    public function isVisitor(): ?bool
+    {
+        return $this->visitor;
+    }
+
+    public function setVisitor(bool $visitor): static
+    {
+        $this->visitor = $visitor;
+
+        return $this;
     }
 }

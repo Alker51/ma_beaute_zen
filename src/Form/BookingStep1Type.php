@@ -8,17 +8,18 @@ use App\Entity\State;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class BookingType extends AbstractType
+class BookingStep1Type extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $isAdmin = $options['is_admin'] ?? false;
 
         $builder
-            ->add('title')
             ->add('start', null, [
                 'widget' => 'single_text',
                 'html5' => true,
@@ -36,24 +37,6 @@ class BookingType extends AbstractType
                 'expanded' => true,
             ])
         ;
-        if ($isAdmin) {
-            $builder->add('worker', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'fullName',
-                'required' => false, // permet la sélection de "Aucun" (null)
-                'placeholder' => 'Aucun',
-                'label' => 'Employé(e) attribué(e)'
-            ]);
-
-            $builder->add('state', EntityType::class, [
-                'class' => State::class,
-                'choice_label' => 'name',
-                'required' => true, // permet la sélection de "Aucun" (null)
-                'placeholder' => 'Aucun',
-                'label' => 'Statut'
-            ]);
-        }
-
     }
 
     public function configureOptions(OptionsResolver $resolver): void
