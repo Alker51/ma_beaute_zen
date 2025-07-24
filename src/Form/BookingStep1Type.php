@@ -17,8 +17,6 @@ class BookingStep1Type extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $isAdmin = $options['is_admin'] ?? false;
-
         $builder
             ->add('start', null, [
                 'widget' => 'single_text',

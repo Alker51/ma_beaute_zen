@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Prise de rendez-vous - Étape 1{% endblock %}
+
+{% block body %}
+    <h2>Étape 1 : Informations du rendez-vous</h2>
+    {{ form_start(form) }}
+    {{ form_row(form.start) }}
+    {{ form_row(form.products) }}
+    {{ form_row(form._token) }}
+    <button class="btn btn-primary">Suivant</button>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('turbo:load', function () {
+        flatpickr("input[type=datetime-local]", {
+            enableTime: true,
+            locale: "fr",
+            dateFormat: "Y-m-d\\TH:i",
+            altFormat: "\\L\\e d F Y \\à H:i",
+            altInput: true,
+            time_24hr: true,
+        });
+
+        flatpickr("#booking_start", {
+            enableTime: true,
+            locale: "fr",
+            dateFormat: "Y-m-d\\TH:i",
+            altFormat: "\\L\\e d F Y \\à H:i",
+            altInput: true,
+            time_24hr: true,
+        });
+    });
+</script>
+{% endblock %}

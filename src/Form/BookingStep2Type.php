@@ -2,8 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Booking;
-use App\Entity\Produit;
+use App\Entity\Gender;
 use App\Entity\State;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -21,11 +20,29 @@ class BookingStep2Type extends AbstractType
         $isAdmin = $options['is_admin'] ?? false;
 
         $builder
-            ->add('customerName', TextType::class, [
+            ->add('customerLastName', TextType::class, [
                 'label' => 'Nom',
+            ])
+            ->add('customerFirstName', TextType::class, [
+                'label' => 'Prénom',
             ])
             ->add('customerEmail', EmailType::class, [
                 'label' => 'Email'
+            ])
+            ->add('customerGender', EntityType::class, [
+                'class' => Gender::class,
+                'required' => true,
+                'placeholder' => 'Choisissez un genre',
+                'label' => 'Genre'
+            ])
+            ->add('customerAdress', TextType::class, [
+                'label' => 'N° et Rue'
+            ])
+            ->add('customerZipCode', TextType::class, [
+                'label' => 'Code postal'
+            ])
+            ->add('customerCity', TextType::class, [
+                'label' => 'Ville'
             ])
             ->add('customerPhone', TelType::class, [
                 'label' => 'Téléphone'
@@ -43,8 +60,8 @@ class BookingStep2Type extends AbstractType
             $builder->add('state', EntityType::class, [
                 'class' => State::class,
                 'choice_label' => 'name',
-                'required' => true, // permet la sélection de "Aucun" (null)
-                'placeholder' => 'Aucun',
+                'required' => true,
+                'placeholder' => 'Statut du rendez-vous',
                 'label' => 'Statut'
             ]);
         }
@@ -53,7 +70,7 @@ class BookingStep2Type extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Booking::class,
+            'data_class' => null,
             'is_admin' => false,
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
