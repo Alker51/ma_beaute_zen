@@ -3,6 +3,13 @@
 {% block title %}Prise de rendez-vous - Étape 2{% endblock %}
 
 {% block body %}
+    <h1>Résumé du rendez-vous</h1>
+
+    <p>Votre rendez vous aura lieu le : <strong>{{ rdvStartDate }}</strong> à : <strong>{{ rdvStartHours }}</strong><br>
+        Nous estimons que votre rendez-vous prendra environ <strong>{{ delayRDV }}</strong> minutes*.<br>
+        L’heure de fin de votre rendez-vous est estimée à : <strong>{{ rdvEndHours }}</strong>*</p>
+    <p><small>* Ces délais sont communiqués à titre indicatif. Votre rendez-vous pourrait se terminer en dehors des horaires initialement prévus.</small></p>
+
     <h2>Étape 2 : Vos informations</h2>
     {{ form_start(form) }}
     {{ form_row(form.customerLastName) }}
