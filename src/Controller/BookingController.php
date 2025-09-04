@@ -18,6 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/booking', name: 'app_booking_')]
@@ -55,7 +56,7 @@ final class BookingController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, StateRepository $stateRepository, UserRepository $userRepository, ProduitRepository $produitRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, StateRepository $stateRepository, UserRepository $userRepository, ProduitRepository $produitRepository,UserPasswordHasherInterface $passwordHasher): Response
     {
         $booking = new Booking();
         $saisie = $request->getSession()->get('saisie_formulaire_rdv', []);
@@ -188,7 +189,119 @@ final class BookingController extends AbstractController
                         false,
                         true
                     );
+
+                    $userRepository->save($user, true);
+                    $title = '[Ma Beauté Zen]Confirmation de création de compte.';
+                    $body = '
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>' . $title . '</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .header {
+            text-align: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .header img {
+            max-width: 150px;
+        }
+        .content {
+            padding: 20px;
+            background-color: #fff;
+        }
+        .content h1 {
+            color: #444;
+        }
+        .content p {
+            margin-bottom: 15px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #6a178f;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px 0;
+            border-top: 1px solid #ddd;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+        .footer a {
+            color: #6a178f;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td align="center" valign="top">
+                <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #f9f9f9;">
+                    <!-- Header -->
+                    <tr>
+                        <td align="center" valign="top" style="padding: 20px;">
+                            <img src="https://example.com/logo.png" alt="Logo" style="max-width: 150px;">
+                        </td>
+                    </tr>
+                    <!-- Content -->
+                    <tr>
+                        <td valign="top" style="padding: 20px; background-color: #fff;">
+                            <h1 style="color: #444;">' . $title . '</h1>
+                            <p>Cher(e) ' . $user->getFirstName() . ',</p>
+                            <p>Votre compte a été créé avec succès.</p>
+                            <p><strong>Email :</strong> ' . $user->getEmail() . '</p>
+                            <p><strong>Mot de passe temporaire :</strong> ' . $user->getPassword() . '</p>
+                            <p><strong>Merci de bien vouloir vous connecter avec votre mot de passe temporaire. Lors de cette premiere connexion, un changement de mot de passe vous sera demandé.</strong></p>
+                            <p>Si vous avez des questions ou besoin de modifier des informations, n\'hésitez pas à nous contacter ou a vous rendre sur votre compte.</p>
+                            <p><a href="#" style="color: #6a178f; text-decoration: none;">Accéder à mon compte.</a></p>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td align="center" valign="top" style="padding: 10px 0; border-top: 1px solid #ddd; margin-top: 20px; font-size: 12px; color: #777;">
+                            <p>&copy; 2025 Ma Beauté Zen. Tous droits réservés.</p>
+                            <p>
+                                <a href="#" style="color: #6a178f; text-decoration: none;">Politique de confidentialité</a> |
+                                <a href="#" style="color: #6a178f; text-decoration: none;">Conditions d\'utilisation</a> |
+                                <a href="#" style="color: #6a178f; text-decoration: none;">Contactez-nous</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>';
+
+                    new EmailController()->sendMail($user->getEmail(), $title, $body, true);
                 }
+
+                $pass = $user->getPassword();
+                $user->setPassword($passwordHasher->hashPassword($user, $pass));
 
                 $booking->setCustomer($user);
 
@@ -207,6 +320,119 @@ final class BookingController extends AbstractController
                 $request->getSession()->remove('booking_step1');
 
                 $this->addFlash('success', 'Réservation enregistrée !');
+
+                $formatter = new \IntlDateFormatter('fr_FR', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE);
+                $start = $formatter->format(new DateTime($booking->getStart()->format('Y-m-d')));
+
+                $title = '[Ma Beauté Zen]Confirmation de Rendez-vous.';
+                $body = '
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>'.$title.'</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .header {
+            text-align: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .header img {
+            max-width: 150px;
+        }
+        .content {
+            padding: 20px;
+            background-color: #fff;
+        }
+        .content h1 {
+            color: #444;
+        }
+        .content p {
+            margin-bottom: 15px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px 0;
+            border-top: 1px solid #ddd;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+        .footer a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td align="center" valign="top">
+                <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #f9f9f9;">
+                    <!-- Header -->
+                    <tr>
+                        <td align="center" valign="top" style="padding: 20px;">
+                            <img src="https://example.com/logo.png" alt="Logo" style="max-width: 150px;">
+                        </td>
+                    </tr>
+                    <!-- Content -->
+                    <tr>
+                        <td valign="top" style="padding: 20px; background-color: #fff;">
+                            <h1 style="color: #444;">'.$title.'</h1>
+                            <p>Cher [Nom du client],</p>
+                            <p>Votre rendez-vous a été confirmé avec succès.</p>
+                            <p><strong>Date :</strong> '. $start .'</p>
+                            <p><strong>Heure :</strong> '.$booking->getStart()->format('H:m').'</p>
+                            <p><strong>Lieu :</strong> Salon Ma Beauté Zen</p>
+                            <p>Si vous avez des questions ou besoin de modifier votre rendez-vous, n\'hésitez pas à nous contacter.</p>
+                            <a href="#" style="display: inline-block; padding: 10px 20px; background-color: #dc3545; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px; margin-left: 10px;">Annuler le rendez-vous</a>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td align="center" valign="top" style="padding: 10px 0; border-top: 1px solid #ddd; margin-top: 20px; font-size: 12px; color: #777;">
+                            <p>&copy; 2023 Ma Beauté Zen. Tous droits réservés.</p>
+                            <p>
+                                <a href="#" style="color: #007BFF; text-decoration: none;">Politique de confidentialité</a> |
+                                <a href="#" style="color: #007BFF; text-decoration: none;">Conditions d\'utilisation</a> |
+                                <a href="#" style="color: #007BFF; text-decoration: none;">Contactez-nous</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+';
+
+                new EmailController()->sendMail($user->getEmail(), $title, $body, true);
+
                 return $this->redirectToRoute('app_booking_index');
             }
 
