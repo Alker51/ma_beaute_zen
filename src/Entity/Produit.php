@@ -262,24 +262,4 @@ class Produit
     {
         return $this->getName();
     }
-
-    public static function timeToStringTime(int $time): string
-    {
-        if ($time === 0)
-            return 'Aucun délai.';
-
-        if ($time >= 60) {
-            $hours = floor($time / 60);
-            $minutes = $time % 60;
-            $result = $hours . ' heure' . ($hours > 1 ? 's' : '');
-
-            if ($minutes > 0) {
-                $result .= ' ' . $minutes . ' minute' . ($minutes > 1 ? 's' : '');
-            }
-
-            return $result . '.';
-        }
-
-        return $time . ' minute' . ($time > 1 ? 's' : '') . '.';
-    }
 }

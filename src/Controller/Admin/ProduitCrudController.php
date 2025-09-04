@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\TimeController;
 use App\Entity\Produit;
 use App\Form\ImageType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -67,18 +68,7 @@ class ProduitCrudController extends AbstractCrudController
                         return 'Aucune durée indiquée.';
 
                     $delay = $entity->getDelay();
-                    if ($delay >= 60) {
-                        $hours = floor($delay / 60);
-                        $minutes = $delay % 60;
-                        $result = $hours . ' heure' . ($hours > 1 ? 's' : '');
-
-                        if ($minutes > 0) {
-                            $result .= ' ' . $minutes . ' minute' . ($minutes > 1 ? 's' : '');
-                        }
-
-                        return $result . '.';
-                    }
-                    return $delay . ' minute' . ($delay > 1 ? 's' : '') . '.';
+                    return new TimeController()->minutesToHoursMinutes($delay);
                 }),
 
             FormField::addColumn(4,'Prix, Stock et Promotion'),

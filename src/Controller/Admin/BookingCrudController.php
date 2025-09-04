@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Controller\StateController;
+use App\Controller\TimeController;
 use App\Entity\Booking;
 use App\Entity\Produit;
 use App\Repository\StateRepository;
@@ -80,7 +81,7 @@ class BookingCrudController extends AbstractCrudController
                         $time = $time + $product->getDelay();
                     }
 
-                    $textTime = Produit::timeToStringTime($time);
+                    $textTime = new TimeController()->minutesToHoursMinutes($time);
                     return $textTime;
                 }),
 
