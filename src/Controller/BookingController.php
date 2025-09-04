@@ -321,6 +321,8 @@ final class BookingController extends AbstractController
 
                 $this->addFlash('success', 'Réservation enregistrée !');
 
+                // TODO : Simplifier le code, beaucoup de code redondant. Mettre les body html dans des fichiers séparé.
+
                 $formatter = new \IntlDateFormatter('fr_FR', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE);
                 $start = $formatter->format(new DateTime($booking->getStart()->format('Y-m-d')));
 
