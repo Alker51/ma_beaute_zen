@@ -415,8 +415,12 @@ final class BookingController extends AbstractController
                             <h1 style="color: #444;">'.$title.'</h1>
                             <p>Cher [Nom du client],</p>
                             <p>Votre rendez-vous a été confirmé avec succès.</p>
+                            <h2>Début du rendez-vous</h2>
                             <p><strong>Date :</strong> '. $start .'</p>
                             <p><strong>Heure :</strong> '.$booking->getStart()->format('H\hi').'</p>
+                            <h2>Fin estimée du Rendez-vous</h2>
+                            <p><strong>Heure estimée :</strong> '.$booking->getEnd()->format('H\hi').'</p>
+                            <p><strong>Durée estimée :</strong> '.$delay.'</p>
                             <p><strong>Lieu :</strong> Salon Ma Beauté Zen</p>
                             <p>Si vous avez des questions ou besoin de modifier votre rendez-vous, n\'hésitez pas à nous contacter.</p>
                             <a href="#" style="display: inline-block; padding: 10px 20px; background-color: #dc3545; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px; margin-left: 10px;">Annuler le rendez-vous</a>
@@ -453,7 +457,7 @@ final class BookingController extends AbstractController
                 'form' => $form->createView(),
                 'rdvStartDate' => $start,
                 'rdvStartHours' => $startRDV->format('H \h i'),
-                'delayRDV' => $delay,
+                'delayRDV' => new TimeController()->minutesToHoursMinutes($delay),
                 'rdvEndHours' => $end->format('H \h i'),
             ]);
         }
