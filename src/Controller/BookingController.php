@@ -408,7 +408,7 @@ final class BookingController extends AbstractController
                             <p>Cher [Nom du client],</p>
                             <p>Votre rendez-vous a été confirmé avec succès.</p>
                             <p><strong>Date :</strong> '. $start .'</p>
-                            <p><strong>Heure :</strong> '.$booking->getStart()->format('H:m').'</p>
+                            <p><strong>Heure :</strong> '.$booking->getStart()->format('H:i').'</p>
                             <p><strong>Lieu :</strong> Salon Ma Beauté Zen</p>
                             <p>Si vous avez des questions ou besoin de modifier votre rendez-vous, n\'hésitez pas à nous contacter.</p>
                             <a href="#" style="display: inline-block; padding: 10px 20px; background-color: #dc3545; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px; margin-left: 10px;">Annuler le rendez-vous</a>
