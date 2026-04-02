@@ -1,6 +1,6 @@
 {
     "name": "fragment/ma_beaute_zen",
-    "author": "Rémy Robin",
+    "description": "Site web pour la société Ma beauté zen",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
