@@ -1,0 +1,336 @@
+===== composer.json =====
+{
+    "name": "fragment/ma_beaute_zen",
+    "description": "Site web pour la société Ma beauté zen",
+    "type": "project",
+    "license": "proprietary",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.4",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "doctrine/dbal": "^4.4.3",
+        "doctrine/doctrine-bundle": "^3.2",
+        "doctrine/doctrine-migrations-bundle": "^3.7.0",
+        "doctrine/orm": "^3.6.3",
+        "easycorp/easyadmin-bundle": "^5.0.4",
+        "phpdocumentor/reflection-docblock": "^5.6.7",
+        "phpstan/phpdoc-parser": "^2.3.2",
+        "symfony/asset": "^8.0",
+        "symfony/asset-mapper": "^8.0",
+        "symfony/console": "^8.0",
+        "symfony/doctrine-messenger": "^7.4.6",
+        "symfony/dotenv": "^8.0",
+        "symfony/expression-language": "^8.0",
+        "symfony/flex": "^2.10",
+        "symfony/form": "^8.0",
+        "symfony/framework-bundle": "^8.0",
+        "symfony/http-client": "^8.0",
+        "symfony/intl": "^8.0",
+        "symfony/mailer": "^8.0",
+        "symfony/mime": "^8.0",
+        "symfony/monolog-bundle": "^4.0",
+        "symfony/notifier": "^8.0",
+        "symfony/password-hasher": "^8.0",
+        "symfony/process": "^8.0",
+        "symfony/property-access": "^8.0",
+        "symfony/property-info": "^8.0",
+        "symfony/runtime": "^8.0",
+        "symfony/security-bundle": "^8.0",
+        "symfony/security-csrf": "^8.0",
+        "symfony/serializer": "^8.0",
+        "symfony/stimulus-bundle": "^2.34.0",
+        "symfony/string": "^8.0",
+        "symfony/translation": "^8.0",
+        "symfony/twig-bundle": "^8.0",
+        "symfony/ux-turbo": "^2.34.0",
+        "symfony/validator": "^8.0",
+        "symfony/var-exporter": "^8.0",
+        "symfony/web-link": "^8.0",
+        "symfony/yaml": "^8.0",
+        "symfonycasts/reset-password-bundle": "^1.25.0",
+        "tattali/calendar-bundle": "^8.0",
+        "twbs/bootstrap-icons": "^1.13.1",
+        "twig/extra-bundle": "^2.12|^3.24",
+        "twig/twig": "^2.12|^3.24.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true
+        },
+        "bump-after-update": true,
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*",
+        "symfony/polyfill-php82": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ],
+        "start": [
+            "Composer\\Config::disableProcessTimeout",
+            "symfony server:start --no-tls"
+        ],
+        "stop": [
+            "symfony server:stop"
+        ],
+        "db_total_reload": [
+            "php bin/console doctrine:database:drop --force",
+            "php bin/console doctrine:database:create",
+            "php bin/console doctrine:migrations:migrate --no-interaction",
+            "php bin/console doctrine:fixtures:load --no-interaction"
+        ],
+        "db_fixtures_reload": [
+            "php bin/console doctrine:fixtures:load --no-interaction"
+        ],
+        "db_purge": [
+            "php bin/console doctrine:database:drop --force"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "^8.0"
+        }
+    },
+    "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4.3.1",
+        "phpunit/phpunit": "^11.5.55",
+        "symfony/browser-kit": "^8.0",
+        "symfony/css-selector": "^8.0",
+        "symfony/debug-bundle": "^8.0",
+        "symfony/maker-bundle": "^1.67.0",
+        "symfony/phpunit-bridge": "^8.0",
+        "symfony/stopwatch": "^8.0",
+        "symfony/web-profiler-bundle": "^8.0"
+    }
+}
+
+===== config/bundles.php =====
+<?php
+
+return [
+    Symfony\Bundle\FrameworkBundle\FrameworkBundle::class => ['all' => true],
+    Doctrine\Bundle\DoctrineBundle\DoctrineBundle::class => ['all' => true],
+    Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle::class => ['all' => true],
+    Symfony\Bundle\DebugBundle\DebugBundle::class => ['dev' => true],
+    Symfony\Bundle\TwigBundle\TwigBundle::class => ['all' => true],
+    Symfony\Bundle\WebProfilerBundle\WebProfilerBundle::class => ['dev' => true, 'test' => true],
+    Symfony\UX\StimulusBundle\StimulusBundle::class => ['all' => true],
+    Symfony\UX\Turbo\TurboBundle::class => ['all' => true],
+    Twig\Extra\TwigExtraBundle\TwigExtraBundle::class => ['all' => true],
+    Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
+    Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
+    Symfony\Bundle\MakerBundle\MakerBundle::class => ['dev' => true],
+    SymfonyCasts\Bundle\ResetPassword\SymfonyCastsResetPasswordBundle::class => ['all' => true],
+    Symfony\UX\TwigComponent\TwigComponentBundle::class => ['all' => true],
+    EasyCorp\Bundle\EasyAdminBundle\EasyAdminBundle::class => ['all' => true],
+    Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
+    CalendarBundle\CalendarBundle::class => ['all' => true],
+];
+
+===== config/packages/doctrine.yaml =====
+doctrine:
+    dbal:
+        url: '%env(resolve:DATABASE_URL)%'
+
+        # IMPORTANT: You MUST configure your server version,
+        # either here or in the DATABASE_URL env var (see .env file)
+        #server_version: '16'
+
+        profiling_collect_backtrace: '%kernel.debug%'
+    orm:
+        validate_xml_mapping: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        identity_generation_preferences:
+            Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
+        auto_mapping: true
+        mappings:
+            App:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'App\Entity'
+                alias: App
+
+when@test:
+    doctrine:
+        dbal:
+            # "TEST_TOKEN" is typically set by ParaTest
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    doctrine:
+        orm:
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system
+
+===== config/packages/framework.yaml =====
+# see https://symfony.com/doc/current/reference/configuration/framework.html
+framework:
+    secret: '%env(APP_SECRET)%'
+
+    # Note that the session will be started ONLY if you read or write from it.
+    session: true
+    csrf_protection: ~
+    #esi: true
+    #fragments: true
+
+    form:
+        csrf_protection:
+            enabled: true
+            field_name: 'csrf_token'
+
+    default_locale: fr
+when@test:
+    framework:
+        test: true
+        session:
+            storage_factory_id: session.storage.factory.mock_file
+
+===== config/packages/twig.yaml =====
+twig:
+    file_name_pattern: '*.twig'
+    form_themes: [ 'bootstrap_5_layout.html.twig' ]
+
+when@test:
+    twig:
+        strict_variables: true
+
+===== config/packages/security.yaml =====
+security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        App\Entity\User: 'auto'
+
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+            algorithm: 'auto'
+            cost: 15
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            lazy: true
+            provider: app_user_provider
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                # target: app_any_route
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#the-firewall
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+        secured_area:
+            form_login:
+                enable_csrf: true
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_USER }
+
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+when@test:
+    security:
+        password_hashers:
+            # By default, password hashers are resource intensive and take time. This is
+            # important to generate secure password hashes. In tests however, secure hashes
+            # are not important, waste resources and increase test times. The following
+            # reduces the work factor to the lowest possible values.
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon
+
+===== config/routes files =====
+
+===== config/routes/calendar.yaml.bak =====
+calendar:
+    resource: "@CalendarBundle/Resources/config/routing.yaml"
+
+===== config/routes/easyadmin.yaml =====
+easyadmin:
+    resource: .
+    type: easyadmin.routes
+
+===== config/routes/framework.yaml =====
+when@dev:
+    _errors:
+        resource: '@FrameworkBundle/Resources/config/routing/errors.php'
+        prefix: /_error
+
+===== config/routes/security.yaml =====
+_security_logout:
+    resource: security.route_loader.logout
+    type: service
+
+===== config/routes/web_profiler.yaml =====
+when@dev:
+    web_profiler_wdt:
+        resource: '@WebProfilerBundle/Resources/config/routing/wdt.xml'
+        prefix: /_wdt
+
+    web_profiler_profiler:
+        resource: '@WebProfilerBundle/Resources/config/routing/profiler.xml'
+        prefix: /_profiler
