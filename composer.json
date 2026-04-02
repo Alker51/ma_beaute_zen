@@ -49,6 +49,7 @@
         "symfony/web-link": "^8.0",
         "symfony/yaml": "^8.0",
         "symfonycasts/reset-password-bundle": "^1.25.0",
+        "tattali/calendar-bundle": "^8.0",
         "twbs/bootstrap-icons": "^1.13.1",
         "twig/extra-bundle": "^2.12|^3.24",
         "twig/twig": "^2.12|^3.24.0"
