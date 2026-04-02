@@ -65,16 +65,16 @@ class DashboardController extends AbstractDashboardController
         //yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::section('Gestion Rendez-Vous', 'fa-solid fa-calendar');
         yield MenuItem::linkToRoute('Rendez-vous', 'fa fa-calendar-week', 'admin_booking_calendar_iframe');
-        yield MenuItem::linkToCrud('Liste Rendez-vous', 'fa fa-table-list', Booking::class);
+        yield MenuItem::linkToRoute('Liste Rendez-vous', 'fa fa-table-list', 'admin_booking_index');
 
         yield MenuItem::section('Gestion Clients', 'fa fa-user-gear');;
-        yield MenuItem::linkToCrud('Compte client', 'fa fa-users', User::class);
-        yield MenuItem::linkToCrud('Demande client', 'fa fa-person-circle-question', Contact::class);
+        yield MenuItem::linkToRoute('Compte client', 'fa fa-users', 'admin_user_index');
+        yield MenuItem::linkToRoute('Demande client', 'fa fa-person-circle-question',  'admin_contact_index');
 
         yield MenuItem::section('Gestion Produits & Services', 'fa fa-tag');;
-        yield MenuItem::linkToCrud('Produits', 'fa fa-box', Produit::class);
-        yield MenuItem::linkToCrud('Taxe', 'fa fa-percent', Tax::class);
-        yield MenuItem::linkToCrud('Image', 'fa fa-images', Image::class);
+        yield MenuItem::linkToRoute('Produits', 'fa fa-box', 'admin_produit_index');
+        yield MenuItem::linkToRoute('Taxe', 'fa fa-percent', 'admin_tax_index');
+        yield MenuItem::linkToRoute('Image', 'fa fa-images', 'admin_image_index');
 
         yield MenuItem::section('Administration', 'fa fa-cogs');;
         yield MenuItem::linkToRoute('Retour à l\'accueil', 'fa fa-door-open menu-item-home', 'app_home')->setCssClass('menu-item-home');
